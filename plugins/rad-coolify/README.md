@@ -40,11 +40,13 @@ If you use a fork or private marketplace, replace `radesjardins-codex-skills` wi
 
 ## MCP server
 
-The plugin starts [`@radoriginllc/coolify-mcp`](https://www.npmjs.com/package/@radoriginllc/coolify-mcp) as a local stdio MCP process through `npx`. That package calls the Coolify REST API. It includes read and write tools for applications, deployments, environment variables, databases, services, and other resources.
+The plugin starts [`@radoriginllc/coolify-mcp`](https://www.npmjs.com/package/@radoriginllc/coolify-mcp) 1.1.1 as a local stdio MCP process through `npx`. That package calls the Coolify REST API. It includes read and write tools for applications, deployments, environment variables, databases, services, and other resources.
 
-This MCP setup is client-specific. Agent Plugins 1.0.0 has no portable secret field, so another compatible client may need its own secure credential mapping or MCP configuration. Portable package conformance alone does not make live operations available.
+This MCP setup is client-specific. Agent Plugins 1.0.0 expands only `${PLUGIN_ROOT}` and `${PLUGIN_DATA}`. It has no portable secret field and leaves other `${...}` text unchanged. The plugin therefore does not put `COOLIFY_URL` or `COOLIFY_API_TOKEN` values in `mcp.json`.
 
 This is separate from [Coolify's built-in `/mcp` endpoint](https://coolify.io/docs/integrations/mcp). Coolify currently documents its built-in endpoint as read-only. RAD Coolify does not configure that endpoint.
+
+Normal RAD Coolify API operations use `/api/v1`. `coolify_version` calls `/api/v1/version`. `coolify_healthcheck` calls `/api/health`, which is outside the `/api/v1` prefix.
 
 ### 1. Check requirements
 
@@ -81,12 +83,14 @@ Permission guide:
 | Permission | Use |
 | --- | --- |
 | `read` | Status, inventory, and ordinary read-only queries |
-| `read:sensitive` | Logs, secrets, private keys, environment values, and other sensitive responses |
-| `deploy` | Trigger and manage deployments |
-| `write` | Create, update, start, stop, restart, or delete supported resources |
-| `root` | Full API control. Avoid this unless a specific administrative task requires it |
+| `read:sensitive` | Add for logs or sensitive fields |
+| `deploy` | Add for deployments and lifecycle controls |
+| `write` | Add for application, environment, or other resource changes |
+| `root` | Complete API control for Coolify administration |
 
-Coolify tokens are scoped to the active team. Create separate tokens for separate teams.
+Coolify tokens are scoped to the active team. Create separate tokens for separate teams. `root` bypasses all API permission checks and is unnecessary for normal deployment work.
+
+RAD Coolify needs an API token. Coolify Private Keys are SSH keys for server access or deploy keys for private Git repositories. Never supply a Private Key as `COOLIFY_API_TOKEN`.
 
 ### 4. Set the URL and token
 
@@ -99,7 +103,7 @@ The plugin reads two environment variables:
 
 `COOLIFY_URL` is the dashboard base URL. Do not add `/api/v1` or `/mcp`.
 
-Do not put the token in this repository, a project `.env` file, `.mcp.json`, a prompt, or an issue report. The bundled `.mcp.json` contains variable references only.
+Do not put the token in this repository, a project `.env` file, `config.toml`, `mcp.json`, `.mcp.json`, a plugin cache, a prompt, or an issue report. The bundled MCP files contain no credential values or unsupported `${COOLIFY_URL}` placeholders.
 
 #### Windows PowerShell, persistent for your user account
 
@@ -119,6 +123,37 @@ Do not put the token in this repository, a project `.env` file, `.mcp.json`, a p
 
 Close all Codex windows and reopen Codex after you set or change either variable.
 
+Codex Desktop on Windows can start without the Windows User environment. In that case, restarting Codex is insufficient. Agent Plugins has no platform selector or portable secret reference, so the plugin cannot fix this in `mcp.json`.
+
+Use a user-owned PowerShell launcher outside the repository and plugin cache. The launcher reads the Windows User environment store at runtime and passes the values only to the MCP child process:
+
+```powershell
+$ErrorActionPreference = "Stop"
+
+$coolifyUrl = [Environment]::GetEnvironmentVariable("COOLIFY_URL", "User")
+$coolifyToken = [Environment]::GetEnvironmentVariable("COOLIFY_API_TOKEN", "User")
+
+if ([string]::IsNullOrWhiteSpace($coolifyUrl) -or
+    [string]::IsNullOrWhiteSpace($coolifyToken)) {
+  throw "Coolify MCP setup error: set COOLIFY_URL and COOLIFY_API_TOKEN in the Windows User environment."
+}
+
+$env:COOLIFY_URL = $coolifyUrl
+$env:COOLIFY_API_TOKEN = $coolifyToken
+& npx -y "@radoriginllc/coolify-mcp@1.1.1"
+exit $LASTEXITCODE
+```
+
+Point the user-level `coolify` MCP entry in `config.toml` to that launcher. Keep the token out of TOML:
+
+```toml
+[mcp_servers.coolify]
+command = "powershell.exe"
+args = ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\Users\\YOUR_NAME\\.codex\\launchers\\coolify-mcp.ps1"]
+```
+
+This repository task does not change the live Codex configuration.
+
 #### macOS or Linux, current terminal session
 
 ```bash
@@ -127,7 +162,7 @@ export COOLIFY_API_TOKEN="paste-the-full-token-here"
 codex
 ```
 
-For persistent setup, use your operating system's secret-aware login environment or your shell's startup configuration. A Codex process only sees variables that exist when it starts.
+For persistent setup, use your operating system's secret-aware login environment or your shell's startup configuration. A Codex process only sees variables that exist when it starts. This keeps normal environment-variable behavior on macOS and Linux.
 
 ### 5. Verify with a read-only request
 
@@ -147,6 +182,8 @@ If the MCP connection fails, check:
 - Your API IP allowlist permits the Codex machine.
 - Codex was restarted after the variables changed.
 - Node.js and `npx` are available.
+
+The MCP stops before any request when a variable is missing or still contains an unresolved `${...}` placeholder. Its setup error does not show either value.
 
 ## Safety
 

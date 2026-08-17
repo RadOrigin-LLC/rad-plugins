@@ -15,7 +15,7 @@ The current catalog has 6 plugins and 38 skills. Each plugin targets the Agent P
 | [RAD Plan](plugins/rad-plan/) | 7.1.1 | Solo builders and small teams planning one bounded release | Repository-backed planning, rescue, replan, and plan review; it writes plans and does not implement code |
 | [RAD Repo](plugins/rad-repo/) | 3.2.1 | Repositories used across many coding-agent sessions | An opinionated document model, handoffs, approved checks, and guarded Git shipping; checks cannot prove production health |
 | [RAD PARA](plugins/rad-para/) | 1.1.2 | People who keep local notes and projects in a PARA system | PARA guidance, read-only audits, layered summaries, output help, and approved file moves; no sync service or app connector |
-| [RAD Coolify](plugins/rad-coolify/) | 2.1.2 | Developers who manage self-hosted Coolify v4 deployments | Deployment guidance and local validators, plus optional client-specific MCP actions that need separate setup and credentials |
+| [RAD Coolify](plugins/rad-coolify/) | 2.1.3 | Developers who manage self-hosted Coolify v4 deployments | Deployment guidance and local validators, plus optional client-specific MCP actions that need separate setup and credentials |
 
 ## What is familiar and what is specific
 

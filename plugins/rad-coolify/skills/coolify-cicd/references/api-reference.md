@@ -12,15 +12,21 @@
 https://<COOLIFY_FQDN>/api/v1
 ```
 
+Normal API operations use this prefix. Health is the exception: `GET /api/health` is outside `/api/v1`.
+
 ## Authorization
 
-All endpoints require the `Authorization: Bearer <TOKEN>` header. Tokens are generated in the Coolify UI under **Settings > Keys & Tokens > API Tokens**, scoped to a team, with permission levels:
+API requests use a Bearer API token created under **Keys & Tokens > API Tokens**. Tokens are scoped to the active team. Coolify Private Keys are SSH keys for server access or private Git deploy keys. Never use a Private Key as an API token.
 
-- **read-only** (default) — read access to non-sensitive fields
-- **read:sensitive** — includes env vars, secrets, connection strings
-- **view:sensitive** — view-only access to sensitive fields
-- **`*`** (full CRUD) — all operations
-- **deploy** — deploy-only (trigger deployments, no other writes)
+Current token permissions are:
+
+- `read`: status and ordinary resource reads
+- `read:sensitive`: logs and sensitive fields
+- `deploy`: deployments and deployment lifecycle controls
+- `write`: application, environment, and other resource changes
+- `root`: complete API control for Coolify administration
+
+Use least privilege. Start with `read`, then add only the permission required by the task. `root` bypasses permission checks and is unnecessary for normal deployment work.
 
 **New in beta.474 (April 2026):** Tokens now support optional **expiration dates**. For long-running CI/CD integrations, set an expiration aligned with your secret rotation policy and refresh before it elapses.
 

@@ -15,13 +15,13 @@ description: >
 
 Operational playbooks for managing a Coolify instance using MCP tools. Each workflow maps a user intent to a specific sequence of `coolify_*` tool calls.
 
-> **Requires**: The `coolify` MCP server (bundled with this plugin via `@radoriginllc/coolify-mcp`). Set `COOLIFY_URL` and `COOLIFY_API_TOKEN` environment variables. If MCP tools are not available, fall back to providing the equivalent `curl` commands from the coolify-cicd skill.
+> **Requires**: The `coolify` MCP server (bundled with this plugin via `@radoriginllc/coolify-mcp`). Set `COOLIFY_URL` to the instance base URL and set `COOLIFY_API_TOKEN` to a team-scoped API token. Never supply a Coolify Private Key as the token. If MCP tools are not available, fall back to the equivalent `curl` commands from the coolify-cicd skill.
 
 ## Pre-Flight: Verify Connection
 
 Before any workflow, confirm the MCP connection is live:
 
-1. Call `coolify_healthcheck` — expect a "connected" response
+1. Call `coolify_healthcheck` and expect a "connected" response. It uses root-level `/api/health`, outside `/api/v1`.
 2. If it fails, the MCP server is misconfigured or the Coolify instance is unreachable
 
 ## Workflow 1: Discover What's Running

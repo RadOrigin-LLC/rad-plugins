@@ -119,7 +119,10 @@ Coolify v4 RBAC operates at the **team** level:
 - Users can belong to multiple teams with different roles
 - Resources (servers, apps, databases) belong to a team
 - No per-app or per-server granular permissions within a team
-- API tokens are team-scoped with permission levels: `read-only`, `read:sensitive`, `*` (full CRUD), or `deploy` (trigger deploy only)
+- API tokens are team-scoped. Current permissions are `read`, `read:sensitive`, `deploy`, `write`, and `root`.
+- Use `read` for status. Add `read:sensitive` for logs or sensitive fields, `deploy` for deployments and lifecycle controls, and `write` for application or environment changes.
+- `root` gives complete API control and is unnecessary for normal deployment work.
+- Coolify Private Keys are SSH keys for server access or private Git deploy keys. Never supply one as `COOLIFY_API_TOKEN`.
 
 ### Known RBAC Limitations
 

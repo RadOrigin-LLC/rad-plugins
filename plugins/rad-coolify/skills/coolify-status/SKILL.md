@@ -13,14 +13,14 @@ description: >
 
 One-shot status overview of a Coolify instance. Run the checks, present one compact dashboard, flag anything that needs attention. Read-only — this skill never starts, stops, deploys, or modifies anything.
 
-> **Requires**: The `coolify` MCP server (bundled with this plugin). Set `COOLIFY_URL` and `COOLIFY_API_TOKEN`. If MCP tools are unavailable, say so and point to the plugin README setup section — do not fall back to guessing.
+> **Requires**: The `coolify` MCP server (bundled with this plugin). Set `COOLIFY_URL` to the instance base URL and set `COOLIFY_API_TOKEN` to a team-scoped API token with `read`. If MCP tools are unavailable, say so and point to the plugin README setup section. Do not guess.
 
 ## Procedure
 
 Run these in order (steps 1-2 ground everything else; 3-5 can be summarized from fewer calls if the instance is small):
 
 ```
-Step 1: coolify_healthcheck            → API reachable?
+Step 1: coolify_healthcheck            → root-level /api/health reachable?
 Step 2: coolify_version                → instance version (ground any version-specific advice on THIS, not on docs)
 Step 3: coolify_list_servers           → server reachability
 Step 4: coolify_list_all_resources     → apps/databases/services with status

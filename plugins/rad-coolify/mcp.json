@@ -6,12 +6,8 @@
       "command": "npx",
       "args": [
         "-y",
-        "@radoriginllc/coolify-mcp"
-      ],
-      "env": {
-        "COOLIFY_URL": "${COOLIFY_URL}",
-        "COOLIFY_API_TOKEN": "${COOLIFY_API_TOKEN}"
-      }
+        "@radoriginllc/coolify-mcp@1.1.1"
+      ]
     }
   }
 }
