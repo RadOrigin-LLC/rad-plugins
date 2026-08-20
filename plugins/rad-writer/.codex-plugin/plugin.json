@@ -1,7 +1,7 @@
 {
   "name": "rad-writer",
-  "version": "0.1.0",
-  "description": "Writing, rewriting, editing, proofreading, copy, docs, email, chat, academic, creative, technical, social, wiki.",
+  "version": "0.2.0",
+  "description": "Draft, rewrite, edit, and proofread academic, creative, technical, business, email, social, and reference prose.",
   "homepage": "https://github.com/radesjardins/codex.skills/tree/main/plugins/rad-writer",
   "repository": "https://github.com/radesjardins/codex.skills",
   "license": "MIT",
@@ -12,20 +12,23 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "RAD Writer",
-    "shortDescription": "Writing, editing, academic, creative, technical, business, email, social, wiki.",
-    "longDescription": "Writing, editing, academic, creative, technical, business, email, social, wiki.",
+    "shortDescription": "Draft, rewrite, edit, and proofread clear prose.",
+    "longDescription": "Draft, rewrite, edit, and proofread prose for its reader, purpose, channel, and voice. Preserve facts, citations, meaning, and deliberate style.",
     "developerName": "RAD",
     "category": "Productivity",
     "capabilities": [
-      "Writing and rewriting",
-      "Academic and neutral prose",
+      "Drafting and rewriting",
+      "Copyediting and proofreading",
+      "Academic and reference prose",
       "Creative writing",
       "Technical documentation",
       "Email, chat, and support",
-      "Social and B2B copy"
+      "Social and business copy"
     ],
     "defaultPrompt": [
       "Rewrite this for clarity and reader fit.",
+      "Proofread this without changing its meaning or voice.",
+      "Review this draft and report issues without rewriting it.",
       "Edit this technical guide for clear, direct instructions.",
       "Tighten this email without adding claims.",
       "Review this academic draft for unsupported claims.",

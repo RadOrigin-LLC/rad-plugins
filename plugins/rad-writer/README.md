@@ -1,8 +1,8 @@
 # RAD Writer
 
-RAD Writer is an Agent Plugins 1.0.0 package for better AI-assisted writing. It helps Codex draft, rewrite, edit, and proofread text for its intended reader and purpose.
+RAD Writer is an Agent Plugins 1.0.0 package for AI-assisted writing. It helps Codex draft, rewrite, copyedit, proofread, and review text for its intended reader and purpose.
 
-Its goal is good writing: clear meaning, specific language, accurate claims, natural rhythm, useful structure, and a voice that fits the work. It covers academic, creative, technical, business, email, chat, support, outreach, social, B2B, and neutral reference writing.
+Its goal is clear meaning, specific language, supported claims, useful structure, and a voice that fits the work. It covers academic, creative, technical, business, email, chat, support, outreach, social, marketing, and neutral reference writing.
 
 RAD Writer does not:
 
@@ -12,15 +12,17 @@ RAD Writer does not:
 - invent citations, evidence, personal experience, or story facts;
 - guarantee factual accuracy, publication acceptance, or a particular reader response.
 
-The skill preserves facts, numbers, citations, uncertainty, plot details, code, and deliberate voice. It flags missing support instead of filling gaps with guesses.
+The skill sets different boundaries for drafting, rewriting, copyediting, proofreading, and review. It preserves facts, numbers, citations, uncertainty, plot details, code, and deliberate voice. It flags missing support instead of filling gaps with guesses.
 
 ## Skill
 
 | Skill | Use it for |
 | --- | --- |
-| [writing](skills/writing/SKILL.md) | Drafting, rewriting, editing, proofreading, and auditing prose across common writing modes |
+| [writing](skills/writing/SKILL.md) | Drafting, rewriting, copyediting, proofreading, and reviewing common forms of prose |
 
-The skill routes by audience and purpose. It applies shared checks for clarity, specificity, evidence, structure, and accidental platform metadata, then applies the rules for the selected mode.
+The skill selects an operation and a primary writing mode. It applies shared checks for clarity, evidence, voice, structure, accessibility, and accidental platform metadata, then uses the rules for the selected mode.
+
+The package includes [behavior cases](tests/writing-cases.json) for manual or automated forward testing. They define required outcomes and preservation checks. They do not prove writing quality across every model or prompt.
 
 ## Install
 
@@ -30,7 +32,11 @@ codex plugin add rad-writer@radesjardins-codex-skills
 
 ## Limits
 
-Good editing still needs human review when facts, sources, safety, law, or publication standards matter. The package improves the supplied text and reasoning. It cannot verify unsupported claims without reliable sources.
+Good editing still needs human review when facts, sources, privacy, safety, law, academic integrity, or publication rules matter. Editing alone does not verify claims. The skill can check claims only when the user requests verification and reliable sources are available.
+
+Wikipedia and other governed projects can restrict AI-assisted text. The skill tells the agent to check current project rules before preparing text for publication.
+
+RAD Writer has no hosted service, MCP server, background process, authorship detector, or automatic publishing action.
 
 ## License
 

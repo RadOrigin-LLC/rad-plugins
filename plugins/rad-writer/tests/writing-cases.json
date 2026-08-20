@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "purpose": "Forward-test the writing skill with observable preservation and output checks.",
+  "scoring": {
+    "check": "Give one point when the output meets the check and zero points when it does not.",
+    "case_pass": "A case passes only when every check receives one point.",
+    "suite_pass": "The suite passes only when every case passes. Human judgment is required where a check concerns meaning or voice."
+  },
+  "cases": [
+    {
+      "id": "proofread_preserves_meaning",
+      "request": "Proofread only. Return the corrected paragraph without an editorial note.",
+      "input": "The results was recorded on 12 May. Error rates stayed at 4.2%, which suggest the change may be safe.",
+      "checks": [
+        "Corrects the agreement errors in 'results was' and 'which suggest'.",
+        "Preserves the date, 4.2% figure, and uncertainty expressed by 'may'.",
+        "Does not restructure the paragraph or add a factual claim.",
+        "Returns only the corrected paragraph."
+      ]
+    },
+    {
+      "id": "rewrite_preserves_evidence",
+      "request": "Rewrite this for a general reader. Keep every fact, citation, and caveat.",
+      "input": "In the observed sample, response time fell by 18% (Lee, 2025), although the trial did not measure long-term load.",
+      "checks": [
+        "Preserves 18%, Lee, 2025, and the sample boundary.",
+        "Preserves the missing long-term-load limitation.",
+        "Adds no cause, guarantee, or new source."
+      ]
+    },
+    {
+      "id": "review_does_not_rewrite",
+      "request": "Review this paragraph for clarity and unsupported claims. Do not rewrite it.",
+      "input": "Our revolutionary tool always cuts support costs and is the best choice for every small business.",
+      "checks": [
+        "Reports the absolute and comparative claims as unsupported.",
+        "Explains the clarity problem with precise examples.",
+        "Does not return a rewritten paragraph."
+      ]
+    },
+    {
+      "id": "academic_citation_integrity",
+      "request": "Copyedit this abstract and add a citation for the final claim.",
+      "input": "We observed higher germination after seven days. This method is now the leading approach worldwide.",
+      "checks": [
+        "Copyedits without changing the observation.",
+        "Does not invent an author, title, DOI, journal, or finding.",
+        "Marks the worldwide claim as needing support or asks for a source."
+      ]
+    },
+    {
+      "id": "creative_voice_preservation",
+      "request": "Copyedit this line. Keep the first-person voice and deliberate fragments.",
+      "input": "I waited. No bus. Just rain ticking off the bent sign, same as yesterday.",
+      "checks": [
+        "Preserves first-person voice, fragments, rain image, and yesterday reference.",
+        "Does not add a plot event, emotion, moral, or decorative metaphor.",
+        "Makes no change unless a clear copyediting problem exists."
+      ]
+    },
+    {
+      "id": "technical_exactness",
+      "request": "Rewrite this as a short procedure using selected Simplified Technical English principles.",
+      "input": "After npm test prints PASS, run npm run deploy. Do not run deploy first because it can publish untested code.",
+      "checks": [
+        "Keeps both commands exact.",
+        "Places the test condition and warning before the deploy action.",
+        "Does not claim full ASD-STE100 compliance or claim that either command was tested."
+      ]
+    },
+    {
+      "id": "marketing_claim_control",
+      "request": "Turn this into a short product announcement.",
+      "input": "The new export screen is available today. We think it can save teams several minutes on large reports.",
+      "checks": [
+        "Preserves 'today' and presents the time saving as an unverified estimate.",
+        "Does not invent usage metrics, customer quotes, urgency, or a guarantee.",
+        "Uses a clear point and a specific call to action only if the input supports one."
+      ]
+    },
+    {
+      "id": "quoted_platform_marker",
+      "request": "Proofread this documentation sentence.",
+      "input": "The parser removes accidental 'turn0search2' markers, but keeps the string when it appears inside a code example.",
+      "checks": [
+        "Keeps the quoted marker because the sentence documents it.",
+        "Preserves the distinction between accidental output and a code example.",
+        "Makes no unsupported technical claim beyond the supplied sentence."
+      ]
+    },
+    {
+      "id": "governed_reference_policy",
+      "request": "Write a new Wikipedia article from these notes.",
+      "input": "The notes contain a subject name and two uncited claims. No project policy or reliable sources were supplied.",
+      "checks": [
+        "Does not present publication-ready article text.",
+        "States that current project rules and reliable sources must be checked.",
+        "Offers neutral-writing advice or source planning without inventing facts or citations."
+      ]
+    }
+  ]
+}

@@ -4,7 +4,7 @@ A small public marketplace for solo developers and vibe coders who want clearer 
 
 The plugins add written procedures, templates, and local checks. They can make agent work more consistent, but they do not make Codex infallible or replace review, tests, backups, or product judgment. Installing this marketplace does not add a hosted service, database, account system, or background worker.
 
-The current catalog has 6 plugins and 38 skills. Each plugin targets the Agent Plugins 1.0.0 working draft and includes Codex compatibility metadata. Agent Plugins standardizes the portable package layout for skills and MCP servers. It does not standardize marketplace installation, permissions, secrets, or client-specific user interfaces. All packages use the MIT License.
+The current catalog has 7 plugins and 39 skills. Each plugin targets the Agent Plugins 1.0.0 working draft and includes Codex compatibility metadata. Agent Plugins standardizes the portable package layout for skills and MCP servers. It does not standardize marketplace installation, permissions, secrets, or client-specific user interfaces. All packages use the MIT License.
 
 ## Choose a plugin
 
@@ -16,6 +16,7 @@ The current catalog has 6 plugins and 38 skills. Each plugin targets the Agent P
 | [RAD Repo](plugins/rad-repo/) | 3.2.1 | Repositories used across many coding-agent sessions | An opinionated document model, handoffs, approved checks, and guarded Git shipping; checks cannot prove production health |
 | [RAD PARA](plugins/rad-para/) | 1.1.2 | People who keep local notes and projects in a PARA system | PARA guidance, read-only audits, layered summaries, output help, and approved file moves; no sync service or app connector |
 | [RAD Coolify](plugins/rad-coolify/) | 2.1.3 | Developers who manage self-hosted Coolify v4 deployments | Deployment guidance and local validators, plus optional client-specific MCP actions that need separate setup and credentials |
+| [RAD Writer](plugins/rad-writer/) | 0.2.0 | People drafting or editing prose with an AI agent | Operation-specific writing guidance for academic, creative, technical, business, email, social, and reference text; facts and publication rules still need human review |
 
 ## What is familiar and what is specific
 
@@ -29,6 +30,7 @@ Their value comes from how those practices are joined and limited:
 - RAD Repo uses common repository instructions, handoffs, and Git checks. Its main difference is a small authority model and clone-local approval for repository validation commands.
 - RAD PARA applies established second-brain methods. It puts setup, review, distillation, output assembly, and session continuity in one plugin, with approval required before a real folder reorganization.
 - RAD Coolify combines familiar deployment guidance with four file-based validators. Its review path runs those checks before it judges health endpoints, service relationships, and deployment intent. Live actions depend on a separate npm MCP package and client-managed credentials.
+- RAD Writer uses familiar editing practices. It separates drafting, rewriting, copyediting, proofreading, and review so the agent does not make broader changes than the request permits. It preserves supplied facts and flags missing support, but editing alone does not verify a claim.
 
 ## Important limits
 
@@ -63,6 +65,7 @@ codex plugin add rad-plan@radesjardins-codex-skills
 codex plugin add rad-repo@radesjardins-codex-skills
 codex plugin add rad-para@radesjardins-codex-skills
 codex plugin add rad-coolify@radesjardins-codex-skills
+codex plugin add rad-writer@radesjardins-codex-skills
 ~~~
 
 The plugins do not require each other. RAD Brainstorm, RAD Plan, and RAD Repo mention a companion only when its exact skill is available and the current work needs it. RAD PARA can share a handoff with RAD Repo when both apply.
@@ -76,6 +79,7 @@ The plugins do not require each other. RAD Brainstorm, RAD Plan, and RAD Repo me
 - "Run RAD Repo startup and show the next task."
 - "Audit this PARA folder without changing anything."
 - "Review this project for Coolify deployment risks."
+- "Proofread this report without changing its meaning or voice."
 
 The plugin pages list every skill, its output, and its limits.
 

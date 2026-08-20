@@ -11,6 +11,7 @@ Use the mode that matches the requested output. These are quality checks, not a 
 - Replace contrast formulas such as `not X, but Y` with a direct statement when the contrast adds no real reasoning. Avoid repeated triplets and uniform bold-label lists.
 - Match rhythm to the work. Vary sentence length and paragraph shape without imposing a quota. Preserve fragments, repetition, dialect, and other deliberate choices when they carry voice.
 - Keep headings, bullets, quotes, code, citations, and links in the format the audience needs. Remove accidental assistant or platform metadata.
+- Preserve the requested language variant, reading level, terms, names, pronouns, and accessibility requirements. Do not change identity language or culturally specific wording without a clear reason.
 
 ## Academic writing
 
@@ -18,6 +19,7 @@ Use the mode that matches the requested output. These are quality checks, not a 
 - Use only citations supplied by the user or verified from the available sources. Never invent authors, papers, DOIs, page numbers, or findings. Mark missing support as `[citation needed: topic]`.
 - Keep methods and terms exact. Prefer active voice when it names the actor clearly; use passive voice when the action matters more than the actor. If a label such as `multifaceted` remains, name its dimensions.
 - Remove paper-tour introductions and unsupported significance. Use sentence-case headings and restrained lists.
+- Follow the named journal, school, or publisher policy. Check current rules when AI disclosure, authorship, confidentiality, or submission requirements matter. The human author remains responsible for the work.
 
 ## Creative writing
 
@@ -28,9 +30,10 @@ Use the mode that matches the requested output. These are quality checks, not a 
 
 ## Technical writing
 
-- Apply ASD-STE100 when the user requests Simplified Technical English. Use one action or idea per sentence or step, active voice, imperative steps, complete words, and condition-before-action order.
+- When the user requests Simplified Technical English, apply these selected STE principles: one action or topic per sentence or step, active voice where the agent is known, imperative steps, complete words, and condition-before-action order. Do not claim full ASD-STE100 compliance unless the current standard and controlled dictionary are available and checked.
 - Avoid noun stacks and vague action verbs. Replace `synchronize` with `copy`, `match`, or another exact action when the direction is known. State exact prerequisites, limits, units, causes, errors, warnings, recovery steps, and expected results.
 - Keep commands, identifiers, code, and product terms exact. Do not replace a technical term with a plainer word when precision would suffer.
+- For procedures, make each action and expected result clear. Keep warnings before the action that can cause harm. Do not claim that an untested command or procedure works.
 
 ## Email, chat, support, and outreach
 
@@ -50,7 +53,8 @@ Use the mode that matches the requested output. These are quality checks, not a 
 - Use a neutral point of view. State facts directly and attribute opinions to named sources.
 - Remove praise, promotional wording, legacy claims, vague reception claims, and broad significance unless specific sources support them.
 - Keep terms consistent. Do not rotate synonyms for style. End with the final relevant fact instead of an upbeat summary.
+- For Wikipedia or another governed reference project, check its current AI, sourcing, neutrality, conflict-of-interest, and disclosure rules before creating publication-ready text. If those rules cannot be checked, limit help to neutral-writing advice and minor copyedits of text supplied by the user.
 
 ## Final pass
 
-Read the result aloud once. Check that each sentence earns its place, each claim has the right certainty, and each instruction or request is clear. If the source lacks a fact needed for a safe or accurate rewrite, stop and flag the gap.
+Review the result sentence by sentence. Check that each sentence earns its place, each claim has the right certainty, and each instruction or request is clear. If the source lacks a fact needed for a safe or accurate result, stop and flag the gap.
