@@ -1,0 +1,27 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "rad-writer",
+  "version": "0.1.0",
+  "description": "Writing, rewriting, editing, proofreading, copy, docs, email, chat, academic, creative, technical, social, wiki.",
+  "homepage": "https://github.com/radesjardins/codex.skills/tree/main/plugins/rad-writer",
+  "repository": "https://github.com/radesjardins/codex.skills",
+  "license": "MIT",
+  "author": {
+    "name": "RAD",
+    "url": "https://github.com/radesjardins"
+  },
+  "keywords": [
+    "writing",
+    "rewriting",
+    "editing",
+    "proofreading",
+    "academic",
+    "creative",
+    "technical",
+    "email",
+    "chat",
+    "marketing",
+    "social",
+    "wiki"
+  ]
+}
