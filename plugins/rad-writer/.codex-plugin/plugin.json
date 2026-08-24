@@ -1,7 +1,7 @@
 {
   "name": "rad-writer",
-  "version": "0.2.0",
-  "description": "Draft, rewrite, edit, and proofread academic, creative, technical, business, email, social, and reference prose.",
+  "version": "0.2.1",
+  "description": "Draft, rewrite, edit, and proofread prose while preserving facts, citations, meaning, and deliberate voice.",
   "homepage": "https://github.com/radesjardins/codex.skills/tree/main/plugins/rad-writer",
   "repository": "https://github.com/radesjardins/codex.skills",
   "license": "MIT",
@@ -13,7 +13,7 @@
   "interface": {
     "displayName": "RAD Writer",
     "shortDescription": "Draft, rewrite, edit, and proofread clear prose.",
-    "longDescription": "Draft, rewrite, edit, and proofread prose for its reader, purpose, channel, and voice. Preserve facts, citations, meaning, and deliberate style.",
+    "longDescription": "Draft, rewrite, edit, and proofread prose for its reader, purpose, channel, and voice. Preserve facts, citations, meaning, and deliberate style; editing alone does not verify claims.",
     "developerName": "RAD",
     "category": "Productivity",
     "capabilities": [

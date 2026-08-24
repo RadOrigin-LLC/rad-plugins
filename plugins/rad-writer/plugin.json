@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "rad-writer",
-  "version": "0.2.0",
-  "description": "Draft, rewrite, edit, and proofread academic, creative, technical, business, email, social, and reference prose.",
+  "version": "0.2.1",
+  "description": "Draft, rewrite, edit, and proofread prose while preserving facts, citations, meaning, and deliberate voice.",
   "homepage": "https://github.com/radesjardins/codex.skills/tree/main/plugins/rad-writer",
   "repository": "https://github.com/radesjardins/codex.skills",
   "license": "MIT",

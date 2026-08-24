@@ -7,6 +7,12 @@ description: Draft, rewrite, copyedit, proofread, or review academic, creative, 
 
 Improve prose for its reader, purpose, channel, and voice. Preserve the user's facts, meaning, and deliberate style. This skill does not detect authorship, hide AI use, or replace fact-checking and human review.
 
+## PARA handoff
+
+PARA Express owns gathering and outlining source notes, while Writer owns the accepted draft, rewrite, copyedit, proofread, or review operation.
+
+Offer `rad-para:express-workflow` only when that exact skill appears in the current available-skill list. Ask whether the user accepts the handoff and wait for acceptance before invoking it. Do not treat a package name, README, or memory as proof that the skill is loaded. After acceptance, hand off gathering or outlining and resume this skill with the accepted material and selected operation. If the exact skill is absent or the user declines, continue the current writing operation standalone.
+
 ## Choose the operation
 
 - **Draft:** Create new text from the supplied brief, facts, and sources.

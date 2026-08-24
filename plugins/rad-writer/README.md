@@ -14,6 +14,12 @@ RAD Writer does not:
 
 The skill sets different boundaries for drafting, rewriting, copyediting, proofreading, and review. It preserves facts, numbers, citations, uncertainty, plot details, code, and deliberate voice. It flags missing support instead of filling gaps with guesses.
 
+## PARA handoff
+
+PARA Express owns gathering and outlining source notes, while RAD Writer owns the accepted draft, rewrite, copyedit, proofread, or review operation.
+
+RAD Writer may offer `rad-para:express-workflow` only when that exact skill appears in the current available-skill list. It asks whether the user accepts the handoff and waits for acceptance before invoking it. Once accepted, PARA Express returns the gathered notes or outline and RAD Writer handles the accepted operation. If the exact skill is absent or the user declines, RAD Writer continues the current operation standalone.
+
 ## Skill
 
 | Skill | Use it for |
