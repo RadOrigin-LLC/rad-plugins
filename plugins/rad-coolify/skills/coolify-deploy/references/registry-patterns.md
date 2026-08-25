@@ -1,5 +1,9 @@
 # Registry-Based Deployment Patterns
 
+## Production gate
+
+Before a registry push, application PATCH, or deploy, confirm the exact instance, application UUID, image tag, action, and expected effect. Require user acceptance. In CI, protect these steps with a protected environment or manual approval, and stop when approval is missing.
+
 ## GHCR (GitHub Container Registry)
 
 ### Setup in Coolify
@@ -51,33 +55,33 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    environment: production  # Protected environment with required reviewers.
     steps:
       - name: Trigger Coolify Deploy
         run: |
-          curl -X POST "${{ secrets.COOLIFY_WEBHOOK_URL }}" \
+          curl --fail --show-error -X POST "${{ secrets.COOLIFY_WEBHOOK_URL }}" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
             -H "Content-Type: application/json"
 ```
 
 ### Pinning vs Latest
 
-**Always-latest pattern** (for staging/dev):
-- Set image to `ghcr.io/org/app:latest`
+**Floating-tag pattern** (for staging/dev):
+- Set image to `ghcr.io/org/app:<STAGING_TAG>`
 - Configure webhook to trigger deploy on push
-- Coolify pulls fresh `:latest` on each deploy
+- Coolify pulls the selected floating tag on each deploy
 
 **Pinned tag pattern** (for production):
 - Set image to `ghcr.io/org/app:v1.2.3`
 - Update the tag in Coolify when ready to release
 - Or use API to update and deploy: 
   ```bash
-  curl -X PATCH "https://<COOLIFY>/api/v1/applications/<UUID>" \
+          curl --fail --show-error --request PATCH "https://<COOLIFY>/api/v1/applications/<UUID>" \
     -H "Authorization: Bearer <TOKEN>" \
     -d '{"docker_registry_image_tag": "v1.2.4"}'
   ```
@@ -101,7 +105,7 @@ For public images, no registry configuration needed:
 ### Private Images
 
 Register the Docker Hub credentials first, then:
-- Set image to `dockerhubuser/private-app:latest`
+- Set image to `dockerhubuser/private-app:<STAGING_TAG>`
 - Coolify uses stored credentials to pull
 
 ## Private/Self-Hosted Registry
@@ -137,7 +141,7 @@ When deploying the same app to multiple servers, a Docker Registry is **required
 
 | Scenario | Coolify Behavior |
 |----------|-----------------|
-| Deploy with `:latest` tag | Always pulls fresh image (no caching across deploys) |
+| Deploy with a floating tag | Always pulls the selected tag on deploy (no caching across deploys) |
 | Deploy with specific tag (`:v1.2.3`) | Pulls if not already present locally |
 | Same tag, different digest | Coolify detects digest change and pulls new image |
 | Webhook trigger | Pulls and deploys regardless of tag |
@@ -182,6 +186,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production  # Protected environment with required reviewers.
     permissions:
       contents: read
       packages: write
@@ -203,12 +208,12 @@ jobs:
       - name: Deploy to Coolify
         run: |
           # Update image tag and trigger deploy
-          curl -X PATCH "${{ secrets.COOLIFY_URL }}/api/v1/applications/${{ secrets.COOLIFY_APP_UUID }}" \
+          curl --fail --show-error --request PATCH "${{ secrets.COOLIFY_URL }}/api/v1/applications/${{ secrets.COOLIFY_APP_UUID }}" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{"docker_registry_image_tag": "${{ github.sha }}"}'
           
-          curl -X POST "${{ secrets.COOLIFY_URL }}/api/v1/applications/${{ secrets.COOLIFY_APP_UUID }}/deploy" \
+          curl --fail --silent --show-error "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_APP_UUID }}" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"
 ```
 
@@ -216,7 +221,7 @@ jobs:
 
 1. Add GHCR registry (Settings → Docker Registries)
 2. Create application with **Docker Image** build pack
-3. Set image: `ghcr.io/<ORG>/<REPO>/api:latest`
+3. Set image: `ghcr.io/<ORG>/<REPO>/api:<IMMUTABLE_TAG>`
 4. Configure runtime env vars (DATABASE_URL, etc.)
 5. Set health check path: `/api/health`
 6. Enable the application domain and SSL
@@ -225,8 +230,8 @@ jobs:
 
 ```bash
 # Check deployment status
-curl -s "https://<COOLIFY>/api/v1/applications/<UUID>/deployments" \
-  -H "Authorization: Bearer <TOKEN>" | jq '.[0].status'
+curl --fail --show-error --silent "https://<COOLIFY>/api/v1/deployments/applications/<UUID>" \
+  -H "Authorization: Bearer <TOKEN>" | jq '.deployments[0].status'
 
 # Check app is responding
 curl -s "https://api.example.com/api/health"

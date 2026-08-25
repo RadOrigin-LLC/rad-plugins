@@ -1,21 +1,15 @@
 ---
 name: writing
-description: Draft, rewrite, copyedit, proofread, or review academic, creative, technical, business, email, social, marketing, and reference prose.
+description: Draft, write, rewrite, respond to, copyedit, proofread, or review academic, creative, technical, business, email, social, marketing, and reference prose.
 ---
 
 # Writing
 
-Improve prose for its reader, purpose, channel, and voice. Preserve the user's facts, meaning, and deliberate style. This skill does not detect authorship, hide AI use, or replace fact-checking and human review.
-
-## PARA handoff
-
-PARA Express owns gathering and outlining source notes, while Writer owns the accepted draft, rewrite, copyedit, proofread, or review operation.
-
-Offer `rad-para:express-workflow` only when that exact skill appears in the current available-skill list. Ask whether the user accepts the handoff and wait for acceptance before invoking it. Do not treat a package name, README, or memory as proof that the skill is loaded. After acceptance, hand off gathering or outlining and resume this skill with the accepted material and selected operation. If the exact skill is absent or the user declines, continue the current writing operation standalone.
+Create or improve prose for its reader, purpose, channel, and voice. Preserve writing-standards.md](references/writing-standards.md)structure and use facts, meaning, and deliberate style. This skill does not detect authorship, hide AI use, or replace fact-checking and human review.
 
 ## Choose the operation
 
-- **Draft:** Create new text from the supplied brief, facts, and sources.
+- **Draft:** Create new text from the supplied brief, facts, or sources. If reference material is not supplied, use the chat context in addition to web search and training data tied to citable sources to draft your answer.
 - **Rewrite:** Change wording and structure while preserving meaning, facts, uncertainty, citations, and required format.
 - **Copyedit:** Improve clarity, flow, consistency, and usage without changing the argument or adding information.
 - **Proofread:** Correct spelling, grammar, punctuation, and obvious formatting errors only.

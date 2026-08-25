@@ -13,7 +13,7 @@ allowed-tools: Read Glob Grep Bash Write Edit AskUserQuestion
 
 # Wrapup
 
-Leave enough evidence for a new session to continue without guesswork. The default target is under one minute.
+Leave enough evidence for a new session to continue without guesswork.
 
 ## Hard rules
 
@@ -26,15 +26,10 @@ Leave enough evidence for a new session to continue without guesswork. The defau
 
 ## 1. Gather evidence
 
-Run in one batch:
+Run the read-only snapshot in one batch:
 
 ```powershell
-git status --short
-git diff --stat
-git log --oneline -10
-git branch --show-current
-git rev-parse HEAD
-git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
+python ../../scripts/repo-snapshot.py . --json
 ```
 
 Use the conversation only for validation output that ran during this session. If no proof exists, write `Not recorded this session.`
@@ -56,15 +51,20 @@ Required sections:
 - Watchouts, when needed
 - Deferred - do not re-raise
 
-Add the current branch and working-tree state. Use one next action.
+Add the current branch and working-tree state. Use one next action. Write handoff
+schema 2 frontmatter and the Resume anchors from snapshot evidence.
 
 ## 3. Record durable facts only when evidence exists
 
-If the session appears to have settled a lasting decision, show the candidate and ask whether to append it to `docs/decisions.md`.
+When the owner already approved a lasting decision during this session, append one
+typed dated line to `docs/decisions.md`. When validated session evidence established
+a reusable lesson, append one typed dated line to `docs/lessons.md`. Use the format
+in `references/shelf-spec.md`.
 
-If a failure produced a reusable lesson, show the candidate and ask whether to append it to `docs/lessons.md`.
-
-Ask both in one round when both exist. Skip these questions when no candidate exists. Append dated lines only. Design-system decisions belong in `docs/design.md` and require approval for that exact edit.
+When approval or evidence is unclear, put at most one `Memory candidate` in the
+closure report. Do not interrupt normal wrapup with a memory question. A full
+wrapup may ask once for all real candidates. Design-system decisions belong in
+`docs/design.md` and require approval for that exact edit.
 
 ## 4. Choose the requested close
 
@@ -103,6 +103,7 @@ Commit:       <not requested / hash>
 Push:         not requested
 Working tree: <clean / changed paths remain>
 Validation:   <recorded result / not recorded>
+Memory:       <appended record ID / one candidate / none>
 Next action:  <one action>
 ```
 

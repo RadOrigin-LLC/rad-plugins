@@ -1,5 +1,9 @@
 # Log Drain Configuration Reference
 
+## Live-change gate
+
+Before changing a log drain or sending data to an external destination, confirm the exact instance and resource, state the action and expected effect, and require user acceptance. Use a protected environment or manual approval for CI and stop without approval.
+
 ## How Log Drains Work in Coolify
 
 Coolify's log drain system captures container stdout/stderr and forwards them to external services. The drain runs at the **server level** — all containers on that server send logs to the configured drain.
@@ -109,7 +113,7 @@ For better Loki integration, deploy FluentBit as a Docker container:
 # docker-compose.yml for FluentBit log shipper
 services:
   fluentbit:
-    image: fluent/fluent-bit:latest
+    image: fluent/fluent-bit:3.1.10
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf

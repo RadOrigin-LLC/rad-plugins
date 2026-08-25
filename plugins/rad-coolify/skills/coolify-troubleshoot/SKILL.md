@@ -190,10 +190,9 @@ Build logs in Coolify contain both Coolify orchestration output and the actual b
 
 ```bash
 # Via Coolify API
-curl -X POST "https://<COOLIFY>/api/v1/applications/<UUID>/deploy" \
+curl --fail --show-error --request GET "https://<COOLIFY>/api/v1/deploy?uuid=<UUID>&force=true" \
   -H "Authorization: Bearer <TOKEN>" \
-  -H "Content-Type: application/json" \
-  -d '{"force": true}'
+  -H "Content-Type: application/json"
 
 # Or from Coolify UI: Deploy → "Force Rebuild" toggle
 ```
@@ -265,8 +264,9 @@ docker restart coolify-realtime # Websocket/realtime service
 
 ```bash
 # Recommended: Use the UI → Settings → Update
-# Or from CLI:
-curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
+# Or download the exact versioned installer from the official release notes,
+# verify its checksum or signature, inspect it, then run the local file.
+sudo bash /tmp/coolify-install-<VERSION>.sh
 ```
 
 **What can go wrong**:

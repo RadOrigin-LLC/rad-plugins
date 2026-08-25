@@ -15,6 +15,8 @@ One-shot status overview of a Coolify instance. Run the checks, present one comp
 
 > **Requires**: The `coolify` MCP server (bundled with this plugin). Set `COOLIFY_URL` to the instance base URL and set `COOLIFY_API_TOKEN` to a team-scoped API token with `read`. If MCP tools are unavailable, say so and point to the plugin README setup section. Do not guess.
 
+> **CLI first**: When the Coolify CLI is installed, run `coolify context verify`, then run `coolify resource list` for the resource inventory and `coolify deploy list` for deployment inventory. The installed CLI help is authoritative for any other inventory command. Do not assume a `coolify status` command exists.
+
 ## Procedure
 
 Run these in order (steps 1-2 ground everything else; 3-5 can be summarized from fewer calls if the instance is small):

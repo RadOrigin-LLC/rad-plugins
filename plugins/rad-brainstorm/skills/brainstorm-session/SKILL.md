@@ -5,13 +5,13 @@ description: Use when the user explicitly wants to brainstorm, generate or expan
 
 # Brainstorm Session
 
-Help the user develop and select ideas while keeping ownership visible. Do not write code, scaffold a project, start planning, or commit files.
+Help the user develop and select ideas while keeping ownership visible. Do not write code, scaffold a project, start implementation planning, or commit files.
 
 Resolve the plugin root as the directory two levels above this `SKILL.md`. Read `references/facilitation-principles.md`. Read one other reference only when its step requires it.
 
 ## Companion-skill rule
 
-Name an exact RAD Plan, RAD Repo, or RAD Council skill only when the skill is installed, appears in the current available-skill list, current evidence needs it, and it would add clear value. Never invoke it until the user asks or accepts. Public namespaces are `rad-plan:*`, `rad-repo:*`, and `rad-council:*`.
+Name an exact RAD Plan, RAD Repo, or RAD Council skill only when the exact skill appears in the current available-skill list, current evidence needs it, and it would add clear value. Ask whether the user accepts the companion. Never invoke it until the user asks or accepts. If the exact skill is absent or the user declines, continue the current Brainstorm workflow standalone. Public namespaces are `rad-plan:*`, `rad-repo:*`, and `rad-council:*`.
 
 ## 1. Set the session
 
@@ -41,7 +41,7 @@ Settle these facts before broad generation:
 
 Infer facts already clear from the request. Ask one question per turn for a missing fact that could change the idea set. In quick mode, ask only the highest-value missing question.
 
-For software topics, inspect relevant repository docs, code, tests, and recent Git history before proposing designs. Keep this read-only.
+For software topics, inspect relevant repository docs, code, tests, and recent Git history before proposing designs. Read any user-provided research or design evidence from the path or content the user names. Keep this phase read-only and preserve the stated paths and source labels.
 
 Route a complete idea set that only needs ranking to `rad-brainstorm:idea-evaluation`.
 
@@ -57,7 +57,7 @@ Build from the user's terms and constraints. If the user is stuck, use `referenc
 
 ## 4. Add research with consent
 
-Offer research only when a current market, rule, technology, or unfamiliar fact could change the idea set. State the exact research question and value, then ask permission.
+Treat user-provided research or design evidence as supplied evidence. Keep its exact path or link, claims, and source label attached to the related idea or constraint. Offer outside research only when a current market, rule, technology, or unfamiliar fact could change the idea set. State the exact research question and value, then ask permission.
 
 If accepted, use `references/subagent-prompts/domain-research.md`. Use one bounded, read-only subagent when available, or perform the same bounded work directly. Require JSON-first output. Run schema validation with `scripts/validate-json.py` and `domain-research.schema.json`. Re-prompt once on failure. Cite sources and add useful findings as `[research]` ideas or constraints.
 
@@ -72,7 +72,7 @@ After generation:
 1. Group ideas by the underlying way they create value or solve the problem.
 2. Show repeated mechanisms and any missing mechanism.
 3. If the set is narrow, run one small pass from distinct ordinary stakeholder views or a different method.
-4. For ten or more ideas, or clear duplicates, cluster exact and near duplicates. Preserve original text, IDs, and source labels. Ask before merging ideas that differ in audience, mechanism, channel, cost, or risk.
+4. For ten or more ideas, or clear duplicates, cluster exact and near duplicates. Preserve the user's wording, original IDs, and source labels. Ask before merging ideas that differ in audience, mechanism, channel, cost, or risk.
 
 ## 6. Evaluate separately
 
@@ -99,8 +99,8 @@ For a chosen software approach that needs technical design, offer `rad-brainstor
 
 For a full session at risk of interruption, offer the checkpoint contract in `references/session-output.md`. Get a destination before writing. Quick sessions remain file-free unless the user asks.
 
-For the final result, offer conversation only, one dated Markdown file in a chosen personal folder, or `docs/YYYY-MM-DD-<topic>-spec.md` in the current project. Mark a project file as transient when a later planning workflow will consume it. Never write to `docs/design.md`. Never auto-commit.
+For the final result, offer conversation only, one dated Markdown file in a chosen personal folder, or `docs/YYYY-MM-DD-<topic>-spec.md` in the current project. When the user names a repository path, repeat the exact repository path and ask for approval before writing. Write only after approval and do not silently substitute a destination. Mark a project file as transient when a later planning workflow will consume it. Never write to `docs/design.md`. Never auto-commit.
 
 ## 9. Close
 
-Ask whether the result meets the user's need. Get clear approval before suggesting another workflow. Name a companion skill only under the companion-skill rule.
+Ask whether the result meets the user's need. Get clear approval before suggesting another workflow. Name a companion skill only under the companion-skill rule. Stop before implementation planning or code.

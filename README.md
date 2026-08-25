@@ -4,19 +4,19 @@ A small public marketplace for solo developers and vibe coders who want clearer 
 
 The plugins add written procedures, templates, and local checks. They can make agent work more consistent, but they do not make Codex infallible or replace review, tests, backups, or product judgment. Installing this marketplace does not add a hosted service, database, account system, or background worker.
 
-The current catalog has 7 plugins and 39 skills. Each plugin targets the Agent Plugins 1.0.0 working draft and includes Codex compatibility metadata. Agent Plugins standardizes the portable package layout for skills and MCP servers. It does not standardize marketplace installation, permissions, secrets, or client-specific user interfaces. All packages use the MIT License.
+The current catalog has 7 plugins and 40 skills. Each plugin targets the published Agent Plugins 1.0.0 release and includes Codex compatibility metadata. Agent Plugins 1.1.0 is a working draft. Agent Plugins standardizes the portable package layout for skills and MCP servers. It does not standardize marketplace installation, permissions, secrets, or client-specific user interfaces. All packages use the MIT License.
 
 ## Choose a plugin
 
 | Plugin | Version | Best fit | What it adds |
 | --- | ---: | --- | --- |
-| [RAD Plugin Converter](plugins/rad-plugin-converter/) | 1.2.3 | Authors creating, auditing, or converting plugin packages | Local Agent Plugins 1.0.0 checks, safe conversions, and a reviewed publishing workflow; author review is still required |
-| [RAD Brainstorm](plugins/rad-brainstorm/) | 4.1.1 | One person who wants guided idea work before planning | Text-first ideation, separate evaluation, source labels, and a small proof step; no shared canvas or guarantee of good ideas |
-| [RAD Plan](plugins/rad-plan/) | 7.1.1 | Solo builders and small teams planning one bounded release | Repository-backed planning, rescue, replan, and plan review; it writes plans and does not implement code |
-| [RAD Repo](plugins/rad-repo/) | 3.2.1 | Repositories used across many coding-agent sessions | An opinionated document model, handoffs, approved checks, and guarded Git shipping; checks cannot prove production health |
-| [RAD PARA](plugins/rad-para/) | 1.1.2 | People who keep local notes and projects in a PARA system | PARA guidance, read-only audits, layered summaries, output help, and approved file moves; no sync service or app connector |
-| [RAD Coolify](plugins/rad-coolify/) | 2.1.3 | Developers who manage self-hosted Coolify v4 deployments | Deployment guidance and local validators, plus optional client-specific MCP actions that need separate setup and credentials |
-| [RAD Writer](plugins/rad-writer/) | 0.2.0 | People drafting or editing prose with an AI agent | Operation-specific writing guidance for academic, creative, technical, business, email, social, and reference text; facts and publication rules still need human review |
+| [RAD Plugin Converter](plugins/rad-plugin-converter/) | 1.2.4 | Authors creating, auditing, or converting plugin packages | Agent Plugins 1.0.0 checks, bounded conversions, and reviewed marketplace gates; local checks do not prove client runtime support |
+| [RAD Brainstorm](plugins/rad-brainstorm/) | 4.1.2 | One person who wants guided idea work before planning | Text-first ideation, source labels, separate evaluation, and a cheap proof step; no shared canvas or guarantee of useful ideas |
+| [RAD Plan](plugins/rad-plan/) | 7.1.2 | Solo builders and small teams planning one bounded release | Evidence-backed plans, rescue, replan, and review; it writes planning documents and does not implement code |
+| [RAD Repo](plugins/rad-repo/) | 3.3.0 | Repositories used across many coding-agent sessions | Repository context, typed recall, scoped checks, handoffs, and guarded Git shipping; checks cannot prove production health |
+| [RAD PARA](plugins/rad-para/) | 1.1.3 | People who keep local notes and projects in a PARA system | PARA guidance, read-only audits, summaries, output help, handoffs, and approved ledger-based file moves; no sync service |
+| [RAD Coolify](plugins/rad-coolify/) | 2.1.4 | Developers who manage self-hosted Coolify v4 deployments | Deployment guidance, local validators, and optional MCP actions; live actions need client setup, credentials, and user acceptance |
+| [RAD Writer](plugins/rad-writer/) | 0.2.1 | People drafting or editing prose with an AI agent | Operation-specific drafting and editing guidance that preserves supplied facts and voice; claim and publication review remain human work |
 
 ## What is familiar and what is specific
 
@@ -36,7 +36,7 @@ Their value comes from how those practices are joined and limited:
 
 Skills are instructions for an AI agent. They can improve consistency, but they cannot guarantee a correct plan, diagnosis, design, file placement, or release.
 
-Agent Plugins 1.0.0 is still a working draft. These packages follow its current layout, but portable packaging does not mean that every client supports every skill, MCP server, or Codex-specific feature.
+Agent Plugins 1.0.0 is published, and Agent Plugins 1.1.0 is a working draft. These packages follow the 1.0.0 layout, but portable packaging does not mean that every client supports every skill, MCP server, or Codex-specific feature.
 
 The bundled scanners use rules and heuristics. Their findings are evidence to review. They are not proof of code quality, document meaning, or personal productivity.
 
@@ -68,7 +68,16 @@ codex plugin add rad-coolify@radesjardins-codex-skills
 codex plugin add rad-writer@radesjardins-codex-skills
 ~~~
 
-The plugins do not require each other. RAD Brainstorm, RAD Plan, and RAD Repo mention a companion only when its exact skill is available and the current work needs it. RAD PARA can share a handoff with RAD Repo when both apply.
+The plugins do not require each other. Companion handoffs are conditional, require the exact loaded skill, and need user acceptance.
+
+## Companion workflows
+
+| Workflow | Ownership |
+| --- | --- |
+| Brainstorm -> Plan -> Repo | Brainstorm owns idea evidence. Plan owns the implementation plan. Repo owns repository execution. |
+| PARA Express -> Writer | PARA Express owns source-note gathering and the outline. Writer owns the accepted writing operation. |
+| Repo Ship -> Coolify Actions -> Repo Verify Release | Repo Ship owns the exact Git commit and push. Coolify Actions owns platform deployment. Repo Verify Release owns commit-to-production proof. |
+| Plugin Converter Publish -> Repo Ship | Plugin Converter owns package and client release gates. Repo Ship can supply an approved repository Git contract. |
 
 ## Example requests
 

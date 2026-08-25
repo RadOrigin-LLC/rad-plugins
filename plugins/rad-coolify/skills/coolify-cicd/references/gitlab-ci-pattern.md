@@ -1,5 +1,9 @@
 # GitLab CI Integration with Coolify
 
+## Live-change gate
+
+Before a registry update or deploy, confirm the exact instance, resource UUID, image tag, action, and expected effect, then require user acceptance. Production jobs must use a protected environment or manual approval and stop when approval is missing.
+
 ## Direct API Trigger (Simplest)
 
 ### .gitlab-ci.yml
@@ -18,27 +22,27 @@ test:
 
 deploy-staging:
   stage: deploy
-  image: curlimages/curl:latest
+  image: curlimages/curl:8.10.1
   only:
     - develop
   script:
     - |
-      curl -X POST \
-        "${COOLIFY_URL}/api/v1/applications/${COOLIFY_STAGING_UUID}/deploy" \
+      curl --fail --silent --show-error \
+        "${COOLIFY_URL}/api/v1/deploy?uuid=${COOLIFY_STAGING_UUID}" \
         -H "Authorization: Bearer ${COOLIFY_API_TOKEN}" \
         -H "Content-Type: application/json" \
         --fail --silent --show-error
 
 deploy-production:
   stage: deploy
-  image: curlimages/curl:latest
+  image: curlimages/curl:8.10.1
   only:
     - main
   when: manual    # Require manual approval for production
   script:
     - |
-      curl -X POST \
-        "${COOLIFY_URL}/api/v1/applications/${COOLIFY_PROD_UUID}/deploy" \
+      curl --fail --silent --show-error \
+        "${COOLIFY_URL}/api/v1/deploy?uuid=${COOLIFY_PROD_UUID}" \
         -H "Authorization: Bearer ${COOLIFY_API_TOKEN}" \
         -H "Content-Type: application/json" \
         --fail --silent --show-error
@@ -77,22 +81,24 @@ build:
 
 deploy:
   stage: deploy
-  image: curlimages/curl:latest
+  image: curlimages/curl:8.10.1
   only:
     - main
+  environment: production  # Protected environment with required reviewers.
+  when: manual              # Stop unless a reviewer approves.
   script:
     # Update image tag
     - |
-      curl -X PATCH \
+      curl --fail --show-error --request PATCH \
         "${COOLIFY_URL}/api/v1/applications/${COOLIFY_APP_UUID}" \
         -H "Authorization: Bearer ${COOLIFY_API_TOKEN}" \
         -H "Content-Type: application/json" \
         -d "{\"docker_registry_image_tag\": \"${CI_COMMIT_SHA}\"}" \
-        --fail
+        --fail --show-error
     # Trigger deploy
     - |
-      curl -X POST \
-        "${COOLIFY_URL}/api/v1/applications/${COOLIFY_APP_UUID}/deploy" \
+      curl --fail --silent --show-error \
+        "${COOLIFY_URL}/api/v1/deploy?uuid=${COOLIFY_APP_UUID}" \
         -H "Authorization: Bearer ${COOLIFY_API_TOKEN}" \
         --fail
 ```
@@ -104,30 +110,31 @@ deploy:
    - Username: A GitLab deploy token or personal access token username
    - Password: The deploy token or PAT with `read_registry` scope
 2. Create application with **Docker Image** build pack
-3. Set image to `registry.gitlab.com/<GROUP>/<PROJECT>:latest`
+3. Set image to `registry.gitlab.com/<GROUP>/<PROJECT>:<CI_COMMIT_SHA>`
 
 ## Deploy and Wait Pattern
 
 ```yaml
 deploy-with-status:
   stage: deploy
-  image: curlimages/curl:latest
+  image: curlimages/curl:8.10.1
   script:
     - |
       # Trigger deploy and capture response
-      RESPONSE=$(curl -s -X POST \
-        "${COOLIFY_URL}/api/v1/applications/${COOLIFY_APP_UUID}/deploy" \
+      RESPONSE=$(curl -s --fail --show-error \
+        "${COOLIFY_URL}/api/v1/deploy?uuid=${COOLIFY_APP_UUID}" \
         -H "Authorization: Bearer ${COOLIFY_API_TOKEN}" \
         -H "Content-Type: application/json")
       
-      DEPLOY_UUID=$(echo "$RESPONSE" | grep -o '"deployment_uuid":"[^"]*"' | cut -d'"' -f4)
+      # The response field is .deployments[0].deployment_uuid.
+      DEPLOY_UUID=$(echo "$RESPONSE" | grep -o '"deployment_uuid":"[^"]*"' | head -1 | cut -d'"' -f4)
       echo "Deployment started: $DEPLOY_UUID"
       
       # Poll for completion
       for i in $(seq 1 20); do
         sleep 15
-        STATUS=$(curl -s \
-          "${COOLIFY_URL}/api/v1/applications/${COOLIFY_APP_UUID}/deployments/${DEPLOY_UUID}" \
+        STATUS=$(curl -s --fail --show-error \
+          "${COOLIFY_URL}/api/v1/deployments/${DEPLOY_UUID}" \
           -H "Authorization: Bearer ${COOLIFY_API_TOKEN}" | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4)
         
         echo "Attempt $i: $STATUS"
@@ -145,16 +152,16 @@ deploy-with-status:
       exit 1
 ```
 
-## Webhook Alternative (No API Token Needed)
+## Webhook Alternative
 
 ```yaml
 deploy-webhook:
   stage: deploy
-  image: curlimages/curl:latest
+  image: curlimages/curl:8.10.1
   only:
     - main
   script:
-    - curl -X POST "${COOLIFY_WEBHOOK_URL}" --fail --silent --show-error
+    - curl --fail --silent --show-error -X POST "${COOLIFY_WEBHOOK_URL}" -H "Authorization: Bearer ${COOLIFY_API_TOKEN}"
 ```
 
-Set `COOLIFY_WEBHOOK_URL` as a CI/CD variable containing the full webhook URL from Coolify's application settings.
+Set `COOLIFY_WEBHOOK_URL` as a CI/CD variable containing the webhook URL without a token query parameter. Set `COOLIFY_API_TOKEN` as a protected, masked variable and send it in the `Authorization: Bearer` header.

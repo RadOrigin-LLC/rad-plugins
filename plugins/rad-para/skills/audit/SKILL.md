@@ -15,7 +15,8 @@ violations, and improvement opportunities.
 Locate the user's PARA structure. Search for these directory patterns:
 
 - `Projects/`, `Areas/`, `Resources/`, `Archive/` or `Archives/`
-- Numbered: `1-Projects/`, `2-Areas/`, `3-Resources/`, `4-Archive/`
+- Numbered plain-folder variants such as `1-Projects/`, `2 Areas/`, `3_Resources/`, and `4-Archives/`
+- Optional `Inbox/` and `Templates/` folders at the same root
 - Prefer a user-specified path. If none is supplied, check likely roots read-only and avoid broad recursive scans.
 - Obsidian vaults: `.obsidian/` alongside PARA directories
 
@@ -27,17 +28,18 @@ Run all applicable checks and compile results.
 
 ### Check 1: Top-Level Structure Validation
 
-**Expected:** Exactly 4 top-level PARA folders (Projects, Areas, Resources, Archive/Archives).
+**Expected:** One top-level folder for each PARA category: Projects, Areas, Resources, and Archive/Archives. Plain and numbered names are equivalent. Inbox and Templates are optional support folders.
 
 **Flag as violations:**
 - Missing categories (e.g., no Archives folder)
-- Extra top-level folders that aren't PARA categories
-- Misspelled or variant names (e.g., "Project" instead of "Projects")
+- Extra top-level folders that aren't PARA categories or documented optional folders
+- Misspelled names (e.g., "Project" instead of "Projects")
 - More than one level of PARA (nested PARA inside PARA)
 
 **Scoring:**
-- 4 correct folders, no extras → PASS
-- 4 correct + extras → WARN (list the extras)
+- 4 categories, with no extras → PASS
+- 4 categories plus optional folders → PASS
+- 4 categories plus other extras → WARN (list the extras)
 - Missing folders → FAIL (list what's missing)
 
 ### Check 2: Topic-Based Subfolder Detection (Anti-Pattern)
@@ -87,12 +89,10 @@ For each project, evaluate:
 - No modifications in 30+ days AND no clear outcome in folder name
 - Contains only bookmarks or reference material (should be in Resources)
 
-**Project count scoring:**
-- 10-15 active projects → PASS (optimal range)
-- Under 10 → WARN ("Room for more — check if any Areas need projects")
-- Over 15 → WARN ("Attention fragmentation risk — consider Project List Audit")
-- Under 5 → FAIL ("System may not be actively used")
-- Over 20 → FAIL ("Severe fragmentation — urgent audit needed")
+**Project count guidance:**
+- Use the scanner's configured lower and upper bounds as advice.
+- Report counts below or above those bounds as a review prompt.
+- Do not call a project count a failure or a measured health standard.
 
 ### Check 4: Nesting Depth Analysis
 
@@ -110,10 +110,10 @@ List the deepest paths found.
 
 ### Check 5: Orphaned Files Detection
 
-**Scan for files outside the PARA structure:**
+**Scan for files at the supplied root outside the PARA categories:**
 - Files at the PARA root level (not inside any category)
-- Files on Desktop, Downloads, or Documents root that look like captures
-- Stray notes or documents not in any PARA folder
+- Optional Inbox or Templates items that have not been classified
+- Stray notes or documents at the approved root
 
 **Scoring:**
 - 0-5 orphaned files → PASS
@@ -202,5 +202,5 @@ Produce a structured report:
 - **No PARA structure found:** Report clearly and recommend running `para-organize` setup
 - **Extremely large trees (1000+ files):** Limit depth, sample rather than exhaustively scan
 - **Symlinks or cloud sync placeholders:** Skip and note they were skipped
-- **Permission denied:** Report which directories and suggest user intervention
+- **Permission denied or incomplete read:** Report the exact path and stop treating the scan as complete
 - **Non-standard PARA variants:** Accept reasonable variations (numbered prefixes, slight naming differences) but flag significant deviations

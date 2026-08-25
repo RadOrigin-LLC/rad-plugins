@@ -94,6 +94,18 @@ owner first — see the interaction contract).
 - 2026-06-07 · "push to main" always means push to origin/main
 ```
 
+New durable entries use compact typed metadata so recall can filter and check them:
+
+```text
+- <date> · [<DEC-or-LES-ID>] [scope: <repo or path>] [status: active] [source: <commit, test, issue, or authority doc>] [verified: <date or unverified>] [stale-after: <date or never>] [supersedes: <ID or none>] <fact>
+```
+
+Use `DEC-YYYYMMDD-NN` for decisions and `LES-YYYYMMDD-NN` for lessons. Status is
+`active`, `superseded`, or `deprecated`. Append a new record to supersede an old
+one; never edit the old line. Existing untyped lines remain valid and searchable,
+and recall reports them as legacy evidence. Markdown is authoritative. No generated
+index or database is part of the core model.
+
 A paragraph of context is allowed for expensive decisions — same file, still
 append-only, no separate directory. Settled *visual/design* decisions go to
 `docs/design.md` instead; decisions.md may cross-reference design.md but never

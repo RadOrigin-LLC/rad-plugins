@@ -1,7 +1,7 @@
 {
   "name": "rad-repo",
-  "version": "3.2.1",
-  "description": "An Agent Plugins 1.0.0 package for repository context, handoffs, approved checks, and guarded Git shipping in Codex. Its opinionated model and heuristics cannot prove code or production health.",
+  "version": "3.3.0",
+  "description": "An Agent Plugins 1.0.0 package for repository context, typed recall, handoffs, scoped checks, and guarded Git shipping in Codex. Its opinionated model and heuristics cannot prove code or production health.",
   "author": {
     "name": "RAD",
     "url": "https://github.com/radesjardins"
@@ -21,6 +21,7 @@
     "repo-align",
     "repo-doctor",
     "complexity-audit",
+    "recall",
     "doc-shelf",
     "context-stack",
     "trust-report",
@@ -30,13 +31,15 @@
     "agents-md",
     "pre-ship",
     "scoped-instructions",
-    "initiatives"
+    "initiatives",
+    "durable-memory",
+    "validation-timing"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "RAD Repo",
     "shortDescription": "Keep repo context, checks, handoffs, and Git work clear.",
-    "longDescription": "RAD Repo is an Agent Plugins 1.0.0 package with Codex marketplace metadata for repositories used across many agent sessions. It provides small startup context, scoped instructions, local command approval, handoffs, pre-ship checks, explicit commit-and-push work, optional release verification, brownfield adoption, document review, and code hotspot reports. Its document model is opinionated and its scans use heuristics. Pre-ship checks cannot prove code quality or production health.",
+    "longDescription": "Repository context, typed recall, handoffs, scoped checks, guarded Git shipping, and optional release verification for long-lived agent work. It uses an opinionated document model and heuristics. Pre-ship checks cannot prove code quality or production health.",
     "developerName": "RAD",
     "category": "Productivity",
     "capabilities": [
@@ -47,6 +50,7 @@
     "defaultPrompt": [
       "Run repo startup and show the next task.",
       "Run RAD Repo doctor and explain the validation contract.",
+      "Recall the repository decisions and lessons relevant to this task.",
       "Audit this repository for code maintenance hotspots.",
       "Verify that the pushed revision is live in production.",
       "Set up this repo with the doc model.",

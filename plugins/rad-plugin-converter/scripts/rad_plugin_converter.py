@@ -29,8 +29,10 @@ def _print_conversion(result: ConversionResult, as_json: bool) -> None:
     if as_json:
         print(json.dumps(result.to_dict(), indent=2))
         return
-    print(f"Converted: {result.root}")
-    print(f"Changed: {', '.join(result.changed_files) if result.changed_files else 'none'}")
+    heading = "Dry run" if result.dry_run else "Converted"
+    print(f"{heading}: {result.root}")
+    changes_label = "Planned" if result.dry_run else "Changed"
+    print(f"{changes_label}: {', '.join(result.changed_files) if result.changed_files else 'none'}")
     for finding in result.findings:
         location = finding.path
         if finding.line is not None:
@@ -67,6 +69,7 @@ def _parser() -> argparse.ArgumentParser:
     create_parser.add_argument("--license", dest="license_id", default="MIT")
     create_parser.add_argument("--skill", dest="skill_name")
     create_parser.add_argument("--skill-description")
+    create_parser.add_argument("--dry-run", action="store_true", help="List planned writes without changing files.")
     create_parser.add_argument("--json", action="store_true", help="Emit JSON output.")
 
     convert_parser = commands.add_parser("convert", help="Convert one plugin or Agent Skill.")
@@ -74,11 +77,13 @@ def _parser() -> argparse.ArgumentParser:
     mode = convert_parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--in-place", action="store_true", help="Add or repair portable files in the source package.")
     mode.add_argument("--target", type=Path, help="Copy the source to a new target, then convert the target.")
+    convert_parser.add_argument("--dry-run", action="store_true", help="List planned writes without changing files.")
     convert_parser.add_argument("--json", action="store_true", help="Emit JSON output.")
 
     marketplace_parser = commands.add_parser("marketplace", help="Audit or convert local marketplace plugins.")
     marketplace_parser.add_argument("path", type=Path)
     marketplace_parser.add_argument("--apply", action="store_true", help="Write safe conversion changes.")
+    marketplace_parser.add_argument("--dry-run", action="store_true", help="List planned writes without changing files.")
     marketplace_parser.add_argument("--json", action="store_true", help="Emit JSON output.")
 
     return parser
@@ -100,14 +105,17 @@ def main(argv: Sequence[str] | None = None) -> int:
             license_id=args.license_id,
             skill_name=args.skill_name,
             skill_description=args.skill_description,
+            dry_run=args.dry_run,
         )
         _print_conversion(result, args.json)
         return 0 if result.successful else 1
     if args.command == "convert":
-        result = convert_in_place(args.path) if args.in_place else convert_to_target(args.path, args.target)
+        result = convert_in_place(args.path, dry_run=args.dry_run) if args.in_place else convert_to_target(
+            args.path, args.target, dry_run=args.dry_run
+        )
         _print_conversion(result, args.json)
         return 0 if result.successful else 1
-    results = convert_marketplace(args.path, args.apply)
+    results = convert_marketplace(args.path, args.apply, args.dry_run)
     _print_marketplace(results, args.json)
     return 0 if all(result.successful for result in results) else 1
 

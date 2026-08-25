@@ -1,10 +1,14 @@
 # Docker Swarm Guide for Coolify
 
-> **Experimental in Coolify** — this guide documents current known behavior, which may change between releases. Coolify itself is `v4.0.0-beta.474` (April 2026) and the Swarm integration has been labeled experimental since introduction.
+## Live-change gate
+
+Before initializing or changing Swarm, confirm the exact Coolify instance and server, state the action and expected effect, and require user acceptance. Use a protected environment or manual approval for CI and stop without approval.
+
+> **Experimental in Coolify.** This guide documents behavior that may change between releases. Check the exact instance version and current Coolify documentation before using Swarm.
 
 > **Docker Swarm itself is supported through 2030** by Mirantis (the orchestration vendor). It is not deprecated by Docker. The "experimental" label is about Coolify's integration completeness, not Swarm's viability.
 
-> **Known active bug — old container accumulation in rolling updates** (Issue #8299, Feb 2026): in Swarm environments, old containers are not always cleaned up after rolling updates, causing service replica accumulation over time. Monitor `docker service ps <service-name>` periodically and clean up stale replicas with `docker service update --force <service-name>` if they accumulate.
+> **Operational caution:** In Swarm environments, inspect old container cleanup after rolling updates. Monitor `docker service ps <service-name>` and use the current Coolify and Docker documentation before removing stale replicas.
 
 ## Swarm Overview in Coolify
 

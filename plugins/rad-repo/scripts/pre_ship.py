@@ -8,6 +8,7 @@ import fnmatch
 import json
 import re
 import subprocess
+import time
 from pathlib import Path
 
 from repo_contract import (
@@ -129,12 +130,15 @@ def scan_staged(root: Path, config: dict, allow_contract_change: bool = False) -
 def run_validation(root: Path, commands: list[str]) -> list[dict]:
     results: list[dict] = []
     for command in commands:
+        started = time.perf_counter()
         completed = subprocess.run(command, cwd=root, shell=True, capture_output=True, text=True)
-        output = (completed.stdout + completed.stderr).strip()
+        duration_ms = round((time.perf_counter() - started) * 1000)
+        output = (completed.stdout or "") + (completed.stderr or "")
         results.append({
             "command": command,
             "returncode": completed.returncode,
-            "output_tail": output[-2000:],
+            "duration_ms": duration_ms,
+            "output_redacted": bool(output),
         })
         if completed.returncode != 0:
             break
@@ -142,6 +146,7 @@ def run_validation(root: Path, commands: list[str]) -> list[dict]:
 
 
 def main() -> int:
+    started = time.perf_counter()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", nargs="?", default=".")
     parser.add_argument("--config", type=Path)
@@ -177,10 +182,16 @@ def main() -> int:
             validation_contract = {
                 "commands": plan["commands"],
                 "allow_empty": plan["allow_empty"],
+                "unmatched_paths": plan["unmatched_paths"],
                 "fingerprint": fingerprint,
                 "trusted": (not commands and plan["allow_empty"]) or trusted,
             }
-            if not commands and not plan["allow_empty"]:
+            if plan["unmatched_paths"] and not plan["allow_empty"]:
+                findings.append({
+                    "kind": "validation_missing", "path": None,
+                    "message": "no validation command matched changed paths: " + ", ".join(plan["unmatched_paths"]),
+                })
+            elif not commands and not plan["allow_empty"]:
                 findings.append({
                     "kind": "validation_missing", "path": None,
                     "message": "no validation commands were found; run repo-doctor.py for path-by-path details",
@@ -208,6 +219,11 @@ def main() -> int:
     except (OSError, subprocess.CalledProcessError, ValueError) as error:
         report = {"staged_paths": [], "findings": [{"kind": "gate_error", "path": None, "message": str(error)}], "validation": [], "validation_contract": {}, "blocking": True}
 
+    report["timing"] = {
+        "validation_ms": sum(item.get("duration_ms", 0) for item in report["validation"]),
+        "total_ms": round((time.perf_counter() - started) * 1000),
+    }
+
     if args.json:
         print(json.dumps(report, indent=2))
     else:
@@ -215,7 +231,8 @@ def main() -> int:
             location = f" {finding['path']}" if finding.get("path") else ""
             print(f"BLOCK {finding['kind']}:{location} — {finding['message']}")
         for result in report["validation"]:
-            print(f"{'PASS' if result['returncode'] == 0 else 'FAIL'} {result['command']}")
+            output_state = "validation output redacted" if result["output_redacted"] else "no validation output"
+            print(f"{'PASS' if result['returncode'] == 0 else 'FAIL'} {result['command']} [{output_state}]")
         if not report["blocking"]:
             print(f"PASS: {len(report['staged_paths'])} staged path(s) are safe")
     return 1 if report["blocking"] else 0

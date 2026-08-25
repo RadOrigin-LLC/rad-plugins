@@ -1,8 +1,8 @@
 # Build Packs — Detailed Reference
 
-> **Updated April 2026.** Coolify currently ships four build packs in the UI: Nixpacks (default), Static, Dockerfile, Docker Compose. **Railpack is NOT yet a Coolify build pack option** despite community interest (GitHub Discussion #5282, #5519, Issue #7983) — track those threads for adoption status. **Caddy** is now an experimental alternative reverse proxy alongside Traefik (added at beta.237). See `coolify-deploy/SKILL.md` for current proxy options.
+> Build-pack availability changes. Check the exact instance's build-pack selector and the current [Coolify build-pack documentation](https://coolify.io/docs/applications/build-packs) before choosing a pack. Railpack is a Git-only Beta build pack.
 
-> **Important: Nixpacks is in maintenance mode.** Railway (the Nixpacks maintainer) put it into maintenance mode in 2025 to focus on their newer Railpack project. Practical impact for Coolify users: very recent runtime versions (Node 24+, Python 3.13+) may not be available in Nixpacks. The recommended escape hatch is to switch to a Dockerfile build pack for projects that need bleeding-edge runtimes. Existing pinned-version `NIXPACKS_NODE_VERSION=22` style overrides continue to work for older versions.
+> **Important: Nixpacks is in maintenance mode.** Practical impact for Coolify users: newer runtime versions may not be available in Nixpacks. Switch to a Dockerfile build pack when the required runtime is unavailable. Existing pinned-version overrides can continue to work for supported versions.
 
 ## Nixpacks Deep Dive
 
@@ -248,10 +248,10 @@ Coolify serves static files via a built-in web server. Configure:
 ### Current Status
 
 Railpack is an alternative to Nixpacks, developed by Railway. In Coolify:
-- Available as an opt-in build pack in newer Coolify v4 releases
-- **NOT the default** — must be explicitly selected
-- Feature set and compatibility are evolving
-- Report issues to the Coolify GitHub, not to Railway
+- It works only for Git-based deployments.
+- It is marked Beta and must be explicitly selected.
+- Feature support can change, so check the exact instance before use.
+- Test the generated image in staging before production.
 
 ### Differences from Nixpacks
 
@@ -261,7 +261,7 @@ Railpack is an alternative to Nixpacks, developed by Railway. In Coolify:
 | Image size | Moderate | Often smaller |
 | Build speed | Good | Potentially faster |
 | Language support | Very broad | Growing (focus on Node, Python, Go, Rust) |
-| Maturity | Production-ready | Experimental |
+| Maturity | Production-ready | Beta |
 | Configuration | nixpacks.toml, env vars | railpack.json (limited docs) |
 | Community | Large, well-documented | Small, early-stage |
 
@@ -272,4 +272,4 @@ Railpack is an alternative to Nixpacks, developed by Railway. In Coolify:
 3. Verify build output matches Nixpacks build
 4. Monitor for issues for at least one release cycle before using in production
 
-**Recommendation**: Stick with Nixpacks or Dockerfile for production. Use Railpack for experimentation and report findings to improve it.
+**Recommendation**: Check the current instance and test Railpack in staging before using it in production. Use Dockerfile when deterministic image instructions are required.

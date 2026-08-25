@@ -18,22 +18,17 @@ Covers provisioning, backups, SSL, credential management, and operational patter
 
 > **Self-Hosted Only**: All content assumes self-hosted Coolify v4.x. Database management differs on Coolify Cloud.
 
+## Live-change gate
+
+Before creating, restoring, exposing, rotating, dropping, or changing a database, confirm the exact instance, database resource UUID, action, and expected effect. Ask for explicit user acceptance before the write. Keep discovery and backup-status checks read-only.
+
 ## Supported Database Engines
 
-Coolify provides one-click provisioning for these databases:
+Coolify's database catalog and available versions change. Check the instance at use time:
 
-| Engine | Versions Available | Backup Support | Notes |
-|--------|-------------------|----------------|-------|
-| **PostgreSQL** | 13, 14, 15, 16, 17, **18** | Yes (pg_dump) | Most common choice; full backup/restore. **PG18 + pgvector 18 added in beta.463 (Feb 2026).** |
-| **MySQL** | 5.7, 8.0, 8.4 | Yes (mysqldump) | Classic RDBMS |
-| **MariaDB** | 10.x, 11.x | Yes (mariadb-dump) | MySQL-compatible alternative |
-| **MongoDB** | 5.x, 6.x, 7.x | Yes (mongodump) | Document store |
-| **Redis** | 6.x, 7.x | No built-in | In-memory store; use RDB/AOF persistence config |
-| **KeyDB** | Latest | No built-in | Redis-compatible, multi-threaded |
-| **Dragonfly** | Latest | No built-in | Redis-compatible, high-performance |
-| **ClickHouse** | Latest | No built-in | Column-oriented analytics DB |
-
-> **Version note:** Coolify's docs don't always pin exact major versions on the overview page — verify in your running Coolify UI which versions are currently selectable. The overview above reflects what was current as of beta.474 (April 2026). When new major versions ship in upstream images, Coolify typically adds them within a few releases.
+1. Run `coolify context verify`, then use the installed CLI help and resource commands.
+2. Open the exact instance's database creation or resource page and record the engines and versions it offers.
+3. Select only an engine and version returned by that check. Do not treat this guide as a version inventory.
 
 ## Provisioning Decision Tree
 

@@ -10,11 +10,13 @@ description: >
 
 Covers build pack selection, deployment configuration, rolling-update strategies, rollbacks, and registry-based deploys for Coolify v4 self-hosted.
 
-> **Coolify Cloud vs Self-Hosted.** All content assumes self-hosted Coolify v4.x. Coolify Cloud (launched 2025, $5/month + $3/month per server) is a managed control plane and may differ in available options and defaults.
+> **Coolify Cloud vs Self-Hosted.** All content assumes self-hosted Coolify v4.x. Coolify Cloud can differ in available options and defaults.
 
-> **Coolify v4 is a rolling beta.** As of April 2026 the latest release is `v4.0.0-beta.474` (~474 betas over 2 years). The v4.0.0 stable milestone has not been closed. Treat the API and UI as evolving — pin to a specific Coolify version for production automation.
+> **Check the instance at use time.** Coolify features and CLI syntax change. Before choosing a build pack or relying on a version-specific setting, run `coolify context verify`, inspect the exact instance, and use the installed `coolify --help` output as the local reference.
 
-> **Coolify v5 is in early development.** Announced April 2025 with a full PHP rewrite and Vue/Inertia UI. No release date. v4 continues to receive uninterrupted releases.
+## Live-change gate
+
+Before a deploy, rollback, registry change, or application setting update, confirm the exact instance base URL and resource UUID, state the action and expected effect, and ask for explicit user acceptance. For CI, use a protected environment or manual approval. Do not perform the write while any target is unclear.
 
 ## Build Pack Selection Decision Tree
 
@@ -65,23 +67,21 @@ Nixpacks determines the build plan from files at the repo root (or configured ba
 | `.swift` files | Swift | Swift latest |
 | `*.csproj` | .NET | .NET 8+ |
 
-### Railpack (NOT YET in Coolify as of April 2026)
+### Railpack (Git-only Beta)
 
-Railpack is Railway's successor to Nixpacks, currently in Beta upstream (railpack.com). It aims to produce smaller, faster images and supports newer runtime versions that Nixpacks (now in maintenance mode) lags on.
+Coolify documents Railpack as a Beta build pack. It works only with Git-based deployments. Before using it, confirm that Railpack appears in the exact instance's build-pack selector and check the current Coolify guide.
 
-**Coolify status:** Railpack is **not yet a build pack option in Coolify** — the official build packs page lists only Nixpacks, Static, Dockerfile, Docker Compose. Active community discussion threads (GitHub Discussion #5282, #5519, Issue #7983) track the request for Coolify to add Railpack support; no merged PR or shipped UI option as of April 2026.
-
-**When you need newer runtimes than Nixpacks supports:** Switch to a Dockerfile build pack. You can install Railpack inside the Dockerfile if you want, but it's not surfaced as a Coolify-managed build pack.
+Use the same repository and base-directory checks as Nixpacks. Test the generated image and application behavior before replacing a production build. Use a Dockerfile when the repository needs deterministic image instructions beyond the available automatic builders.
 
 ### Reverse Proxy: Traefik (default) vs Caddy (experimental alternative)
 
-Coolify ships **Traefik** as the default reverse proxy. **Caddy** was added as an experimental alternative at beta.237 and now has its own docs section.
+Coolify ships **Traefik** as the default reverse proxy. Caddy is an experimental alternative. Check the exact instance before selecting a proxy.
 
 **Use Traefik (default) unless:**
 - You specifically want Caddy's automatic HTTPS / on-the-fly cert provisioning model
 - You want DNS challenge support that's simpler than Traefik's
 
-**Switching proxies has caveats:** resources created before beta.237 require label migration to switch from Traefik to Caddy. Caddy is still flagged experimental by the Coolify team — Traefik has more battle-tested production usage.
+**Switching proxies has caveats:** existing resources may need label migration. Caddy is experimental, so test the change on the exact instance before production use.
 
 The troubleshooting flows in `coolify-troubleshoot/SKILL.md` are written against Traefik. Caddy users should consult the Caddy section of Coolify docs for proxy-specific debugging.
 
@@ -139,7 +139,7 @@ Configure in the application settings under the deployment section. Scripts run 
 
 ## Rolling Deployments and Rollbacks
 
-> **Honest framing on "zero-downtime."** Coolify's rolling deploy gives effectively-zero-downtime **only when all of these conditions hold**: single-container deployment (NOT docker-compose), no exclusive host port bindings, healthcheck configured and passing reliably, persistent volumes either absent or attachable to multiple containers simultaneously. When any condition fails, Coolify falls back to a recreate strategy (brief downtime) — and there's an open Coolify issue (#8627, late 2025) about rolling updates causing intermittent 502/503s in some configurations. Don't market deploys as "zero-downtime" to stakeholders without verifying the conditions and watching the metric.
+> **Honest framing on "zero-downtime."** Coolify's rolling deploy gives effectively-zero-downtime **only when all of these conditions hold**: single-container deployment (NOT docker-compose), no exclusive host port bindings, healthcheck configured and passing reliably, persistent volumes either absent or attachable to multiple containers simultaneously. When any condition fails, Coolify falls back to a recreate strategy (brief downtime). Verify the conditions and watch the deployment metric on the exact instance before making an availability claim.
 
 ### Rolling Deployment Flow
 
@@ -158,7 +158,7 @@ Coolify falls back to **recreate** strategy (stop old, start new — brief downt
 - Docker Compose deployments (managed by Docker Compose lifecycle, not Coolify's rolling logic)
 - Health checks are not configured (no way to verify new container is ready)
 - The container requires exclusive port binding on the host (not through Traefik)
-- Swarm mode deployments (use Swarm's own rolling update mechanism — and watch for Issue #8299, old container accumulation in Swarm rolling updates as of Feb 2026)
+- Swarm mode deployments (use Swarm's own rolling update mechanism and inspect old container cleanup on the exact instance)
 
 ### Rollbacks
 
@@ -166,10 +166,16 @@ Coolify falls back to **recreate** strategy (stop old, start new — brief downt
 
 **Via API**:
 ```bash
-curl -X POST "https://<COOLIFY_FQDN>/api/v1/applications/<APP_UUID>/restart" \
+set -e
+
+curl --fail --show-error --request PATCH "https://<COOLIFY_FQDN>/api/v1/applications/<APP_UUID>" \
   -H "Authorization: Bearer <YOUR_API_TOKEN>" \
   -H "Content-Type: application/json" \
-  -d '{"tag": "<PREVIOUS_IMAGE_TAG>"}'
+  -d '{"docker_registry_image_tag": "<PREVIOUS_IMAGE_TAG>"}'
+
+curl --fail --show-error \
+  "https://<COOLIFY_FQDN>/api/v1/deploy?uuid=<APP_UUID>" \
+  -H "Authorization: Bearer <YOUR_API_TOKEN>"
 ```
 
 **Persistent storage**: Volumes are preserved across deployments. Define volumes in the application's storage settings to persist data between deploys (database files, uploads, etc.).
@@ -180,15 +186,14 @@ curl -X POST "https://<COOLIFY_FQDN>/api/v1/applications/<APP_UUID>/restart" \
 
 1. **Configure a Docker Registry** in Coolify (Settings → Docker Registries) — provide registry URL, username, and password/token
 2. **Create an application** → choose "Docker Image" as the build pack
-3. **Set the image** field to the full image reference: `ghcr.io/org/app:latest` or `registry.example.com/app:v1.2.3`
+3. **Set the image** field to the full image reference, using an immutable tag or digest: `ghcr.io/org/app:<IMMUTABLE_TAG>` or `registry.example.com/app@sha256:<DIGEST>`
 4. **Deploy** — Coolify pulls the image from the registry and runs it
 
 ### Image Tag Behavior
 
 - Coolify pulls the image on every deploy (does not cache across deploys)
-- Use `latest` tag for always-deploy-newest workflows (webhook-triggered)
-- Pin specific tags (e.g., `v1.2.3`) for controlled deployments
-- Coolify resolves image digests — even `:latest` will detect if the image changed
+- Use an immutable tag or digest for controlled deployments
+- Treat floating tags as a deliberate staging choice and record the trigger that refreshes them
 
 ### Private Registry Authentication
 
@@ -201,7 +206,7 @@ Credentials are stored in Coolify's encrypted database. Configure once per regis
 
 | Anti-Pattern | Consequence |
 |-------------|-------------|
-| Using `latest` tag in production without a webhook trigger | Deployments don't auto-update; you get stale images |
+| Using a floating image tag in production without a refresh trigger | Deployments don't auto-update; you get stale images |
 | Putting secrets as build-time env vars when only needed at runtime | Secrets baked into image layers, visible in `docker history` |
 | Not setting a health check path for zero-downtime deploys | Coolify uses recreate strategy; causes downtime |
 | Setting base directory wrong in monorepos (relative vs absolute) | Build fails or wrong app is built |

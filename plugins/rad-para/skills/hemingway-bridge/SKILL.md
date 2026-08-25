@@ -5,7 +5,9 @@ description: >
   "save my progress", "where did I leave off", "session handoff", "end of session",
   "capture what I was working on", "pick up where I left off", "PARA handoff",
   "what should I do next session", or wants to capture session state in a PARA-aware
-  format before stopping work. Integrates with rad-repo's wrapup/startup cycle.
+  format before stopping work. It can use RAD Repo only after checking that the exact
+  needed `rad-repo:<skill>` appears in the current available-skill list, the current
+  task needs it, and the user accepts.
 ---
 
 # Hemingway Bridge — PARA-Aware Session Handoffs
@@ -95,19 +97,22 @@ about direction, a connection noticed but not yet explored]
 Recommend where to save the bridge note:
 - **Inside the project folder** if the work is project-specific
 - **In the daily log** if multiple projects were touched
-- **In `docs/handoff.md`** if integrating with rad-repo (see below)
+- **In `docs/handoff.md`** only when the exact needed RAD Repo skill is available,
+  the task needs its Git handoff, and the user accepts (see below)
 
-## Integration with rad-repo
+## Optional RAD Repo Integration
 
-When the rad-repo plugin is installed and the work lives inside a git repo,
-`rad-repo:wrapup` owns the session handoff. It refreshes `docs/handoff.md`
-from git evidence. The Hemingway Bridge is the PARA-notes variant: use it for PARA
-vault work (notes, captures, non-code projects) that git evidence can't see.
+RAD Repo is optional. Before offering it, check the current available-skill list for
+the exact needed skill, such as `rad-repo:wrapup` or `rad-repo:startup`. Offer that
+skill only when the current task needs Git-based handoff behavior. Invoke it only
+after the user accepts. If the exact skill is absent or the user declines, keep this
+bridge standalone and use the note format above.
 
 ### docs/handoff.md Integration
 
-When both apply (a PARA-focused session inside a managed repo), fold the bridge's
-elements into the `docs/handoff.md` that `rad-repo:wrapup` writes:
+When the exact `rad-repo:wrapup` skill is available, the task needs its Git-based
+handoff, and the user accepts, pass these bridge elements to that skill for the
+`docs/handoff.md` it writes:
 
 - **Status** → the handoff's session summary
 - **Next Steps / First Action** → the handoff's next-action snapshot
@@ -115,15 +120,22 @@ elements into the `docs/handoff.md` that `rad-repo:wrapup` writes:
 - **PARA Context** (new IPs, unsorted captures) → noted alongside changed files
 - **Momentum Notes** → insights worth preserving
 
+Read the bridge note or `docs/handoff.md` explicitly. Do not assume that another
+skill has read the handoff.
+
 ### Session Startup Integration
 
 When starting a new session after a Hemingway Bridge was written:
 
-1. Read the bridge note (or `docs/handoff.md` — `rad-repo:startup` reads it
-   for you when rad-repo is installed)
+1. Read the bridge note or `docs/handoff.md` explicitly
 2. Present the "First Action" to the user immediately
 3. Surface any unsorted inbox items for quick PARA classification
 4. Resume work with full context -- zero ramp-up time
+
+If the exact `rad-repo:startup` skill appears in the current available-skill list,
+the current task needs its Git startup behavior, and the user accepts, offer and
+invoke it. If the skill is absent or the user declines, continue with these
+standalone startup steps.
 
 ## Bonus: Send-Off Technique
 

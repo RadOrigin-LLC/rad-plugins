@@ -4,7 +4,7 @@ RAD Coolify is an Agent Plugins 1.0.0 package that gives Codex procedures and lo
 
 It is for developers who manage self-hosted Coolify installations and want guidance near their repository work. It does not replace Coolify documentation, server monitoring, backups, or a staging environment.
 
-## What is included
+## Skills
 
 | Skill | Purpose |
 | --- | --- |
@@ -21,7 +21,7 @@ It is for developers who manage self-hosted Coolify installations and want guida
 
 Four Python scripts check Dockerfiles, Compose files, environment handling, and deployment pipelines. They use file rules and heuristics. Their findings require review.
 
-## What is specific
+## Review path
 
 Many Coolify guides explain one setup step. RAD Coolify keeps related repository checks together and separates them into focused skills. The review skill runs deterministic file checks before it judges health endpoints, service relationships, and deployment intent.
 
@@ -46,7 +46,7 @@ This MCP setup is client-specific. Agent Plugins 1.0.0 expands only `${PLUGIN_RO
 
 This is separate from [Coolify's built-in `/mcp` endpoint](https://coolify.io/docs/integrations/mcp). Coolify currently documents its built-in endpoint as read-only. RAD Coolify does not configure that endpoint.
 
-Normal RAD Coolify API operations use `/api/v1`. `coolify_version` calls `/api/v1/version`. `coolify_healthcheck` calls `/api/health`, which is outside the `/api/v1` prefix.
+Normal RAD Coolify API operations use `/api/v1`. Deploy requests use the documented `/api/v1/deploy` route with a resource UUID. `coolify_version` calls `/api/v1/version`. `coolify_healthcheck` calls `/api/health`, which is outside the `/api/v1` prefix.
 
 ### 1. Check requirements
 
@@ -184,6 +184,17 @@ If the MCP connection fails, check:
 - Node.js and `npx` are available.
 
 The MCP stops before any request when a variable is missing or still contains an unresolved `${...}` placeholder. Its setup error does not show either value.
+
+## Live-change gate
+
+Any live write, including a deploy, restart, environment change, backup change, or resource update, requires this order:
+
+1. Confirm the exact Coolify instance base URL.
+2. Resolve the exact resource name and UUID, then read its current state.
+3. State the exact action and expected effect.
+4. Ask for user acceptance of that exact instance, resource, and action.
+
+Do not call a mutating MCP or API operation before explicit user acceptance. Keep the operation read-only when any target is unclear.
 
 ## Safety
 

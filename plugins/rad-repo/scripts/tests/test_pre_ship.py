@@ -17,7 +17,7 @@ def git(root, *args):
     )
 
 
-def scan(files, config=None, extra_args=None, unstaged_files=None, approve=False):
+def scan(files, config=None, extra_args=None, unstaged_files=None, approve=False, json_output=True):
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
         git(root, "init", "-q")
@@ -29,6 +29,11 @@ def scan(files, config=None, extra_args=None, unstaged_files=None, approve=False
             path.write_text(content, encoding="utf-8")
         if config:
             (root / ".rad-repo.json").write_text(json.dumps(config), encoding="utf-8")
+            scopes = config.get("validation", {}).get("scopes", {})
+            for scope in scopes:
+                scope_path = root / scope
+                if not scope_path.suffix:
+                    scope_path.mkdir(parents=True, exist_ok=True)
         git(root, "add", "-f", "--", ".")
         if approve:
             approval = subprocess.run(
@@ -40,11 +45,17 @@ def scan(files, config=None, extra_args=None, unstaged_files=None, approve=False
             path = root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content, encoding="utf-8")
+        command = [sys.executable, str(SCRIPT), str(root)]
+        if json_output:
+            command.append("--json")
+        command.extend(extra_args or [])
         result = subprocess.run(
-            [sys.executable, str(SCRIPT), str(root), "--json", *(extra_args or [])],
+            command,
             capture_output=True, text=True, check=False,
         )
-        return result.returncode, json.loads(result.stdout)
+        if json_output:
+            return result.returncode, json.loads(result.stdout)
+        return result.returncode, result.stdout + result.stderr
 
 
 code, report = scan({".env": "SECRET=value\n"})
@@ -113,6 +124,83 @@ code, report = scan(
 )
 assert code == 0, report
 assert report["validation"][0]["returncode"] == 0, report
+assert isinstance(report["validation"][0]["duration_ms"], int), report
+assert report["validation"][0]["duration_ms"] >= 0, report
+assert report["validation"][0]["output_redacted"] is True, report
+assert "output_tail" not in report["validation"][0], report
+assert isinstance(report["timing"]["total_ms"], int), report
+assert report["timing"]["validation_ms"] >= report["validation"][0]["duration_ms"], report
+
+code, report = scan(
+    {"src/app.py": "print('scoped')\n"},
+    {"validation": {"scopes": {".rad-repo.json": ["echo scoped"], "src": ["echo scoped"]}, "allow_empty": False}},
+    ["--allow-contract-change", "--run-validation"],
+    approve=True,
+)
+assert code == 0, report
+assert report["validation_contract"]["commands"][0]["command"] == "echo scoped", report
+assert report["validation"][0]["command"] == "echo scoped", report
+
+contract_config = {
+    "validation": {
+        "scopes": {
+            ".rad-repo.json": ["echo contract"],
+            "src": ["echo scoped"],
+        },
+        "allow_empty": False,
+    }
+}
+code, report = scan(
+    {"src/app.py": "print('contract')\n"},
+    contract_config,
+    ["--run-validation"],
+)
+assert code == 1, report
+assert report["findings"][0]["kind"] == "contract_change", report
+assert report["validation"] == [], report
+
+code, report = scan(
+    {"src/app.py": "print('contract')\n"},
+    contract_config,
+    ["--allow-contract-change", "--run-validation"],
+    approve=True,
+)
+assert code == 0, report
+assert report["validation_contract"]["unmatched_paths"] == [], report
+assert {item["command"] for item in report["validation_contract"]["commands"]} == {
+    "echo contract", "echo scoped"
+}, report
+
+code, report = scan(
+    {"src/app.py": "print('scoped')\n", "docs/readme.md": "docs only\n"},
+    {"validation": {"scopes": {".rad-repo.json": ["echo scoped"], "src": ["echo scoped"]}, "allow_empty": False}},
+    ["--allow-contract-change", "--run-validation"],
+)
+assert code == 1, report
+assert report["findings"][0]["kind"] == "validation_missing", report
+assert report["validation_contract"]["commands"][0]["command"] == "echo scoped", report
+assert report["validation_contract"]["unmatched_paths"] == ["docs/readme.md"], report
+assert report["validation"] == [], report
+
+code, report = scan(
+    {"docs/readme.md": "docs only\n"},
+    {"validation": {"scopes": {".rad-repo.json": ["echo scoped"], "src": ["echo scoped"]}, "allow_empty": False}},
+    ["--allow-contract-change", "--run-validation"],
+)
+assert code == 1, report
+assert report["findings"][0]["kind"] == "validation_missing", report
+assert report["validation_contract"]["commands"][0]["command"] == "echo scoped", report
+assert report["validation_contract"]["allow_empty"] is False, report
+assert report["validation"] == [], report
+
+code, report = scan(
+    {"README.md": "docs only\n"},
+    {"validation": {"scopes": {}, "allow_empty": False}},
+    ["--allow-contract-change", "--run-validation"],
+)
+assert code == 1, report
+assert report["findings"][0]["kind"] == "validation_missing", report
+assert report["validation_contract"]["commands"] == [], report
 
 code, report = scan(
     {"README.md": "docs only\n"},
@@ -120,5 +208,44 @@ code, report = scan(
     ["--allow-contract-change", "--run-validation"],
 )
 assert code == 0, report
+
+validation_secret = "DISTINCTIVE_VALIDATION_OUTPUT_SECRET_8F3A"
+validation_files = {
+    "check.py": (
+        "import sys\n"
+        f"print({validation_secret!r})\n"
+        f"print({validation_secret!r}, file=sys.stderr)\n"
+    ),
+}
+validation_config = {
+    "validation": {
+        "scopes": {
+            ".rad-repo.json": ["python check.py"],
+            "check.py": ["python check.py"],
+        },
+        "allow_empty": False,
+    }
+}
+code, report = scan(
+    validation_files,
+    validation_config,
+    ["--allow-contract-change", "--run-validation"],
+    approve=True,
+)
+assert code == 0, report
+assert report["validation"][0]["command"] == "python check.py", report
+assert report["validation"][0]["output_redacted"] is True, report
+assert validation_secret not in json.dumps(report), report
+
+code, rendered = scan(
+    validation_files,
+    validation_config,
+    ["--allow-contract-change", "--run-validation"],
+    approve=True,
+    json_output=False,
+)
+assert code == 0, rendered
+assert validation_secret not in rendered, rendered
+assert "validation output redacted" in rendered, rendered
 
 print("pre-ship regression tests passed")

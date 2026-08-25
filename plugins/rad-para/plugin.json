@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "rad-para",
-  "version": "1.1.2",
-  "description": "An Agent Plugins 1.0.0 package for one-person PARA organization, reviews, summaries, and handoffs. It has no sync service or app connector and can misclassify sparse notes.",
+  "version": "1.1.3",
+  "description": "Guidance for one-person PARA organization, reviews, summaries, and handoffs. It has no sync service or app connector and can misclassify sparse notes.",
   "homepage": "https://github.com/radesjardins/codex.skills/tree/main/plugins/rad-para",
   "repository": "https://github.com/radesjardins/codex.skills",
   "license": "MIT",

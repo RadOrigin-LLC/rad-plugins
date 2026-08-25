@@ -7,9 +7,11 @@ reports remain evidence for human or agent judgment.
 
 ### `repo_contract.py`
 
-Discovers root and scoped `AGENTS.md` files, excludes dependency/build trees and
-out-of-repository symlinks, parses labeled validation commands, records each command
+Discovers root and scoped `AGENTS.md` files, excludes dependency, build, worktree,
+template, and fixture trees plus out-of-repository symlinks, parses labeled validation commands, records each command
 source, and merges optional global or path-scoped commands from `.rad-repo.json`.
+Every configured scope target must exist. When `allow_empty` is false, the JSON
+plan reports and blocks every changed path that has no matching command.
 
 ```bash
 python repo_contract.py <project-dir> src/app.py --json
@@ -40,6 +42,27 @@ python pre_ship.py <project-dir> --run-validation --json
 Exit `1` means shipping is blocked. Review contract changes before adding
 `--allow-contract-change`; unstaged contract edits cannot be bypassed, and the flag
 is never a general bypass.
+
+Validation results include per-command and total timing so slow repository checks
+can be scoped or moved to CI with evidence.
+
+### `repo-snapshot.py`
+
+Collects Git state, repository scan output, document freshness, workflow profile,
+handoff metadata, and phase timing in one read-only JSON result for startup and ship.
+
+```bash
+python repo-snapshot.py <project-dir> --json
+```
+
+### `memory-recall.py`
+
+Searches decisions and lessons by keyword and optional repository path. It returns
+five active records by default and marks stale or unverified evidence. It never writes.
+
+```bash
+python memory-recall.py <project-dir> "validation scope" --path src/api --json
+```
 
 ## Context validators
 

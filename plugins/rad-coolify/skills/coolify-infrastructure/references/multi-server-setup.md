@@ -1,5 +1,9 @@
 # Multi-Server Setup Guide
 
+## Live-change gate
+
+Before adding a server, changing firewall rules, or deploying a remote resource, confirm the exact instance and server, state the action and expected effect, and require user acceptance. Use a protected environment or manual approval for CI and stop without approval.
+
 ## Prerequisites
 
 ### Main Coolify Server
@@ -9,7 +13,7 @@
 
 ### Remote Servers
 - Ubuntu 22.04+ or Debian 12+ (recommended)
-- Docker installed: `curl -fsSL https://get.docker.com | sh`
+- Docker installed from the operating system's checked package instructions. Download a versioned package or installer, verify its checksum or signature, inspect it, then install it. Do not pipe a mutable remote script to a shell.
 - SSH server running with key-based authentication
 - Firewall configured to allow SSH from the main Coolify server
 

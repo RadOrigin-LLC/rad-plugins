@@ -17,6 +17,10 @@ Covers the Coolify REST API, GitHub Actions integration, GHCR workflows, webhook
 
 > **Self-Hosted Only**: All content assumes self-hosted Coolify v4.x. API endpoints and webhook behavior may differ on Coolify Cloud.
 
+## Live-change gate
+
+For every API, webhook, or CLI write, confirm the exact instance base URL and resource UUID, state the action and expected effect, and require user acceptance. For unattended CI, put production deploys behind the CI system's protected environment or manual approval. A secret or UUID alone is not approval.
+
 ## Deployment Trigger Methods
 
 | Method | Best For | Complexity |
@@ -48,10 +52,10 @@ Generate tokens in **Coolify UI → Security → API Tokens**. Tokens are team-s
 | `GET` | `/api/v1/applications` | List all applications |
 | `GET` | `/api/v1/applications/{uuid}` | Get application details |
 | `PATCH` | `/api/v1/applications/{uuid}` | Update application settings |
-| `POST` | `/api/v1/applications/{uuid}/deploy` | Trigger deployment |
+| `GET` or `POST` | `/api/v1/deploy` | Trigger deployment by `uuid`, `tag`, `force`, or `pr` |
 | `POST` | `/api/v1/applications/{uuid}/restart` | Restart application |
 | `POST` | `/api/v1/applications/{uuid}/stop` | Stop application |
-| `GET` | `/api/v1/applications/{uuid}/deployments` | List deployments |
+| `GET` | `/api/v1/deployments/applications/{uuid}` | List deployments |
 | `GET` | `/api/v1/servers` | List servers |
 | `GET` | `/api/v1/teams` | List teams |
 | `GET` | `/api/v1/projects` | List projects |
@@ -59,12 +63,14 @@ Generate tokens in **Coolify UI → Security → API Tokens**. Tokens are team-s
 ### Trigger a Deployment
 
 ```bash
-# Basic deploy (note: GET method, not POST)
-curl "https://<COOLIFY_FQDN>/api/v1/deploy?uuid=<APP_UUID>" \
+# Basic deploy (GET is the documented form)
+curl --fail --show-error \
+  "https://<COOLIFY_FQDN>/api/v1/deploy?uuid=<APP_UUID>" \
   -H "Authorization: Bearer <YOUR_API_TOKEN>"
 
 # With optional parameters
-curl "https://<COOLIFY_FQDN>/api/v1/deploy?uuid=<APP_UUID>&force=true" \
+curl --fail --show-error \
+  "https://<COOLIFY_FQDN>/api/v1/deploy?uuid=<APP_UUID>&force=true" \
   -H "Authorization: Bearer <YOUR_API_TOKEN>"
 
 # Response (async — returns deployment job)
@@ -84,7 +90,7 @@ curl "https://<COOLIFY_FQDN>/api/v1/deploy?uuid=<APP_UUID>&force=true" \
 ### Check Deployment Status
 
 ```bash
-curl -s "https://<COOLIFY_FQDN>/api/v1/deployments/<DEPLOYMENT_UUID>" \
+curl --fail --show-error --silent "https://<COOLIFY_FQDN>/api/v1/deployments/<DEPLOYMENT_UUID>" \
   -H "Authorization: Bearer <TOKEN>" | jq '.status'
 
 # Status values: queued, in_progress, finished, failed, cancelled
@@ -101,7 +107,7 @@ curl -s "https://<COOLIFY_FQDN>/api/v1/applications/<APP_UUID>/logs?lines=100" \
 
 ```bash
 # Update image tag for pre-built image deployments
-curl -X PATCH "https://<COOLIFY_FQDN>/api/v1/applications/<APP_UUID>" \
+curl --fail --show-error --request PATCH "https://<COOLIFY_FQDN>/api/v1/applications/<APP_UUID>" \
   -H "Authorization: Bearer <TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -117,7 +123,7 @@ Each application has a unique webhook URL (found in **Application → Webhooks**
 https://<COOLIFY_FQDN>/api/v1/deploy?uuid=<APP_UUID>
 ```
 
-**Method:** GET is the canonical method in Coolify's own docs and GitHub Actions examples. POST also works (with the uuid/tag in the JSON body).
+**Method:** GET is the canonical method in Coolify's own docs and GitHub Actions examples. POST also works (with the uuid/tag in the JSON body). The URL carries the resource UUID only. Send the API token in the `Authorization: Bearer <TOKEN>` header. Do not put a token in the URL query string.
 
 ```bash
 # Canonical (GET)
@@ -125,7 +131,7 @@ curl --fail --show-error \
   "https://<COOLIFY_FQDN>/api/v1/deploy?uuid=<APP_UUID>" \
   -H "Authorization: Bearer <YOUR_API_TOKEN>"
 
-# Also accepted (POST)
+# POST is also documented when the values are sent as JSON.
 curl --fail --show-error -X POST \
   "https://<COOLIFY_FQDN>/api/v1/deploy" \
   -H "Authorization: Bearer <YOUR_API_TOKEN>" \
@@ -134,8 +140,6 @@ curl --fail --show-error -X POST \
 ```
 
 **Always use `--fail`** (or `--fail-with-body` for visibility) — without it, curl returns exit 0 even when the deploy endpoint errors, and CI passes despite a failed trigger. This is exactly what `scripts/audit-cicd.py` checks for.
-
-**HMAC signature verification (new in beta.474, April 2026):** Manual webhook secrets are now encrypted at rest and HMAC signature verification was strengthened. If you generate inbound webhooks pointing AT Coolify (e.g., GitHub→Coolify), the secret stored in Coolify is encrypted; if your CI sends FROM Coolify (e.g., notification webhooks), the outbound HMAC signing was hardened.
 
 **Webhook vs API:** The webhook URL is simpler (single curl call), but offers less control. Use the full API for updating settings before deploy, checking status afterward, or complex multi-step workflows. The bundled `@radoriginllc/coolify-mcp` server wraps the full API and is preferable for any non-trivial CI/CD flow.
 
@@ -152,6 +156,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production  # Configure required reviewers in this protected environment.
     steps:
       - name: Trigger Coolify Deployment
         run: |
@@ -190,13 +195,13 @@ jobs:
   deploy:
     needs: test    # Only runs if tests pass
     runs-on: ubuntu-latest
+    environment: production  # Protected environment with required reviewers.
     steps:
       - name: Deploy to Coolify
         run: |
-          curl -X POST \
-            "${{ secrets.COOLIFY_URL }}/api/v1/applications/${{ secrets.COOLIFY_APP_UUID }}/deploy" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
-            --fail --silent --show-error
+          curl --fail --silent --show-error \
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_APP_UUID }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}"
 ```
 
 ### Multi-Environment (Staging + Production)
@@ -214,20 +219,20 @@ jobs:
     steps:
       - name: Deploy to Staging
         run: |
-          curl -X POST \
-            "${{ secrets.COOLIFY_URL }}/api/v1/applications/${{ secrets.COOLIFY_STAGING_UUID }}/deploy" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" --fail
+          curl --fail --silent --show-error \
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_STAGING_UUID }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}"
 
   deploy-production:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    environment: production    # Requires approval if configured
+    environment: production    # Protected environment with required reviewers.
     steps:
       - name: Deploy to Production
         run: |
-          curl -X POST \
-            "${{ secrets.COOLIFY_URL }}/api/v1/applications/${{ secrets.COOLIFY_PROD_UUID }}/deploy" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" --fail
+          curl --fail --silent --show-error \
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_PROD_UUID }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}"
 ```
 
 ## GHCR Pattern (Full Pipeline)
@@ -247,6 +252,7 @@ env:
 jobs:
   build-push-deploy:
     runs-on: ubuntu-latest
+    environment: production  # Protected environment; stop unless a reviewer approves.
     permissions:
       contents: read
       packages: write
@@ -265,12 +271,11 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Update image tag in Coolify
         run: |
-          curl -X PATCH \
+          curl --fail --show-error --request PATCH \
             "${{ secrets.COOLIFY_URL }}/api/v1/applications/${{ secrets.COOLIFY_APP_UUID }}" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
             -H "Content-Type: application/json" \
@@ -278,9 +283,9 @@ jobs:
 
       - name: Trigger deployment
         run: |
-          curl -X POST \
-            "${{ secrets.COOLIFY_URL }}/api/v1/applications/${{ secrets.COOLIFY_APP_UUID }}/deploy" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" --fail
+          curl --fail --silent --show-error \
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_APP_UUID }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}"
 ```
 
 ## Webhooks and Auto-Deploy
@@ -324,7 +329,7 @@ Coolify supports preview deployments for pull requests:
 | Polling deployment status in a tight loop | Wastes API rate limits; use reasonable intervals (10-15s) |
 | Deploying without running tests first | Broken code reaches production |
 | Using webhook URL in public repos | Anyone can trigger your deployments |
-| Not pinning image tags in production | `latest` tag means non-deterministic deployments |
+| Not pinning image tags in production | Floating tags mean non-deterministic deployments |
 | Skipping the PATCH step in GHCR workflows | Coolify deploys the old image tag, not the new one |
 
 ## Related Skills

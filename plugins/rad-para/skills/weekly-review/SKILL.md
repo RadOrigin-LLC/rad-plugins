@@ -14,7 +14,8 @@ structure and produce a structured review briefing that identifies what needs at
 First, locate the user's PARA structure. Search for these patterns:
 
 1. **Standard PARA folders:** Look for directories named `Projects`, `Areas`, `Resources`,
-   `Archives`, or numbered variants (`1-Projects`, `2-Areas`, etc.)
+   `Archive` or `Archives`, or numbered plain-folder variants (`1-Projects`, `2 Areas`, etc.).
+   `Inbox` and `Templates` may be present as optional support folders.
 2. **Likely locations:** Prefer a path the user specifies. Otherwise check likely roots read-only without broadly recursing through the home directory.
 3. **Obsidian vaults:** Look for `.obsidian/` directories alongside PARA folders
 4. **Notion exports:** Look for exported Notion workspace structures
@@ -73,9 +74,9 @@ Look for unsorted capture locations:
 ### 3. Project Count Check
 
 Count active projects (subfolders in Projects/):
-- **Under 10:** Flag as potentially stalled — suggest checking Areas for emerging projects
-- **10-15:** Healthy range — acknowledge
-- **Over 15:** Flag as attention fragmentation risk — suggest Project List Audit
+- Compare the count with the bounds configured for the local scanner.
+- Report a count outside those bounds as advice for review.
+- Avoid calling the count a health score or a failure.
 
 ### 4. Recent Activity Summary
 
@@ -100,7 +101,7 @@ Produce a structured review briefing in this format:
 **PARA Root:** [path]
 
 ## System Health
-- **Active Projects:** [count] ([healthy/over/under] the 10-15 target)
+- **Active Projects:** [count] (compare with the configured scanner bounds)
 - **Inbox Items:** [count] ([healthy/accumulating/overflowing])
 - **Stale Projects:** [count] (no activity in 14+ days)
 
@@ -132,7 +133,7 @@ Produce a structured review briefing in this format:
 ## Quick Actions
 - [ ] Process inbox items (estimated: [N] minutes)
 - [ ] Archive or revive [N] stale projects
-- [ ] Clear desktop/downloads into PARA folders
+- [ ] Classify approved-root captures into PARA folders
 - [ ] Choose tasks for next week
 ```
 

@@ -124,7 +124,10 @@ check(floating(d) == [], "docs/reference/* is ignored (subdir, not floating)")
 d = make_repo({"AGENTS.md": AGENTS, "docs/handoff.md": "x\n",
                "src/AGENTS.md": "x\n" * 75,
                "packages/web/AGENTS.md": "x\n" * 50,
-               "node_modules/noise/AGENTS.md": "x\n" * 100})
+               "node_modules/noise/AGENTS.md": "x\n" * 100,
+               ".worktrees/feature/AGENTS.md": "x\n" * 100,
+               "templates/project/AGENTS.md": "x\n" * 100,
+               "fixtures/repo/AGENTS.md": "x\n" * 100})
 rep = scan(d)
 check("l0_over_budget" not in rep["breakdown"],
       "root L0 budget does not apply to scoped AGENTS.md overlays")

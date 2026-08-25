@@ -1,6 +1,6 @@
 # Agent Plugins 1.0.0
 
-Use this package with the Agent Plugins 1.0.0 working draft.
+Use this package with the published Agent Plugins 1.0.0 specification. Agent Plugins 1.1.0 is a working draft.
 
 - Portable root manifest: `plugin.json`.
 - Portable components: immediate `skills/<name>/SKILL.md` folders and optional root `mcp.json`.
@@ -10,6 +10,7 @@ Use this package with the Agent Plugins 1.0.0 working draft.
 
 Primary sources:
 
+- https://github.com/agentplugins/agent-plugins-spec
 - https://agent-plugins.org/specification
 - https://agent-plugins.org/plugin-authors/manifest
 - https://agent-plugins.org/plugin-authors/skills

@@ -65,6 +65,7 @@ class AuditReport:
 class ConversionResult:
     root: Path
     changed_files: list[str] = field(default_factory=list)
+    dry_run: bool = False
     findings: list[Finding] = field(default_factory=list)
 
     @property
@@ -79,6 +80,7 @@ class ConversionResult:
         return {
             "root": str(self.root),
             "successful": self.successful,
+            "dry_run": self.dry_run,
             "error_count": self.error_count,
             "changed_files": self.changed_files,
             "findings": [item.to_dict() for item in self.findings],

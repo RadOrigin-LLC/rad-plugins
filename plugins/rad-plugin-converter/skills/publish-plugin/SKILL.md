@@ -23,6 +23,12 @@ Map the user's words to these actions. Do not ask again for an action already co
 
 Identify the package root, target marketplace root, client, destination, version, category, install or authentication policy, Git remote, and branch. Read the registered marketplace name from the client instead of assuming it from repository text. Use the current upstream when it is clear. Ask only when a missing or competing value would change the result.
 
+## Companion-skill rule
+
+RAD Plugin Converter owns package and client release gates. RAD Repo Ship can supply an approved repository Git contract.
+
+Offer `rad-repo:ship` only when the current publish task needs that repository commit and push gate, that exact skill appears in the current available-skill list, and the user accepts the handoff. Wait for acceptance before invoking it. If the exact skill is absent or the user declines, continue the package and client work and report the Git gate as unhandled. Never invoke a companion silently.
+
 ## Run the dry run
 
 1. Read repository instructions and inspect Git status. Stop for conflicting or unrelated changes that overlap the publish paths.

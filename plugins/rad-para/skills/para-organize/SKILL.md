@@ -89,24 +89,29 @@ Setup Guides section) for platform instructions.
 
 Walk through immediately:
 
-1. **Archive everything.** Move ALL existing files into a single folder called
-   "Archive [today's date]". Don't sort. Just move.
-2. **Create 4 top-level folders:** Projects, Areas, Resources, Archives
-3. **Mirror these 4 folders** in every tool the user uses.
-4. **List active projects.** Ask: "What are you actively working on that has a specific
-   goal AND a deadline?"
-5. **Promote actionable units out of Areas.** Ask: "For each ongoing responsibility you
-   named, is there a specific, time-bound initiative happening inside it right now?" These
-   (e.g. "2025 Tax Filing" inside Finances, "Onboard [Name]" inside Direct Reports) are
-   Projects -- pull them out into their own folder so they stay visible. Almost every Area
-   hides one or two.
-6. **Create a folder for each project** inside the Projects folder.
-7. **Done.** The system is live.
+1. **Choose a mode.** Use audit, sort into the existing structure, or fresh start.
+2. **Keep the approved root fixed.** Inspect and plan only inside that root.
+3. **For fresh start only,** plan a dated archive inside the approved root. Do not move
+   anything until the dry-run ledger is reviewed and approved.
+4. **Use the four categories:** audit inspects existing folders, sort keeps existing folders,
+   and fresh start may create the planned folders: Projects, Areas, Resources, Archive/Archives.
+5. **Keep optional Inbox or Templates folders only when they already exist or the plan names them.**
+6. **List active projects.** Ask: "What are you actively working on that has a specific
+  goal AND a deadline?"
+7. **Promote actionable units out of Areas.** Ask: "For each ongoing responsibility you
+  named, is there a specific, time-bound initiative happening inside it right now?" These
+  (e.g. "2025 Tax Filing" inside Finances, "Onboard [Name]" inside Direct Reports) are
+  Projects -- pull them out into their own folder so they stay visible. Almost every Area
+  hides one or two.
+8. **Create a folder for each approved project** only in fresh-start mode. Audit creates no
+   folders. Sort uses existing folders.
+9. **Apply only the approved ledger** in sort or fresh-start mode. Audit writes no ledger,
+   moves, archive retrievals, or inventory.
 
 ### Step 3 -- Optional Next Steps
 
 Offer but don't require:
-- **Project List Audit** -- if more than 15 or fewer than 10 projects
+- **Project List Audit** -- when the configured project-count guidance calls for review
 - **12 Favorite Problems Workshop** -- invoke the `twelve-favorite-problems` skill
 - **Weekly Review setup** -- schedule the first one
 - **30-Day Beginner Plan** -- from `references/workflows.md`
@@ -149,26 +154,30 @@ Say this early and unprompted, before scanning anything:
 
 ### Phase 2 -- Present the Plan (the critical phase)
 
-One readable message, no open questions. Include: (1) the dated archive step, (2) PARA folders
-to create, (3) every project folder with its goal, (4) area/resource folders -- only those
-with files to hold (never create an empty folder), (5) every file retrieved from the archive
-into an active folder. Then ask: "Does this look right? Change anything, or tell me to leave
+One readable message, no open questions. State the selected mode. Include: (1) any dated archive step, (2) PARA folders
+to create only when the mode allows it, (3) every project folder with its goal, (4) area/resource folders -- only those
+with files to hold (never create an empty folder), (5) archive retrievals only when the mode allows them. Audit lists
+candidates and writes no files. Then ask: "Does this look right? Change anything, or tell me to leave
 items alone. I won't move anything until you say go." Wait for approval; re-present changed
 portions if edited.
 
 ### Phase 3 -- Execute (only after approval)
 
-Archive everything to `4 Archives/Archive [date]/`, create top-level folders, create project
-folders, create only the area/resource folders with files and retrieve their files. Then
+Honor the selected mode during execution:
+- **Audit & update:** make no folder, ledger, file move, archive retrieval, or inventory writes; report findings only.
+- **Sort into existing:** move only the approved loose items into existing categories.
+- **Fresh start:** create only the approved folders and dated archive inside the approved root.
+For sort and fresh-start modes, apply moves with `scripts/para_move.py` only after the dry-run ledger is approved.
+Create only the area/resource folders with files and retrieve only the approved files in those modes. Then
 report: counts per category, **judgment calls flagged for review** (non-obvious placements),
-and **items that couldn't be placed confidently** (failed moves, still-ambiguous files). Close
-with where the originals are safe.
+and **items that could not be placed confidently** (failed moves, still-ambiguous files). Close
+with the retained ledger and the exact paths of any failed or restored items.
 
 ### Phase 4 -- Output Inventory
 
-Save `PARA-Inventory.md` to the root, listing every Project (with goal + deadline -- these
-live here, not in folder names), Area (standard maintained), Resource, and the archive entry.
-This is the trust-completion artifact the user scans during weekly review.
+For sort and fresh-start modes, save `PARA-Inventory.md` to the root, listing every Project
+(with goal + deadline -- these live here, not in folder names), Area, Resource, and archive entry.
+Audit mode writes no inventory.
 
 ## System Diagnosis (Broken Systems)
 
@@ -211,8 +220,8 @@ When the user shares content and asks where it goes:
 | **Resources** | Topics of interest | Currently inactive; future reference | Coffee brewing, design inspiration |
 | **Archives** | Inactive items from other three | Cold storage; searchable | Completed projects, ended roles |
 
-### The 10-to-15 Project Rule
-Maintain 10-15 active projects. Fewer risks stalling; more fragments attention.
+### Project count guidance
+Use the scanner's configured lower and upper bounds as review prompts. Counts do not prove system health, and they do not decide where an item belongs.
 
 ## Workflow Quick Reference
 

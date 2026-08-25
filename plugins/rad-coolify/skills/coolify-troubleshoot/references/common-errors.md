@@ -37,7 +37,7 @@
 |-------|-------|-----|
 | Deployment stuck at "In Progress" | Build process hanging (infinite loop, waiting for input) | Cancel deployment; check build command doesn't require stdin |
 | "Port already allocated" | Another container using the same host port | Stop conflicting container or change port mapping |
-| "No space left on device" | Disk full (Docker images, logs, or data) | `docker system prune -a --volumes` (careful: removes unused volumes) |
+| "No space left on device" | Disk full (Docker images, logs, or data) | Start with read-only inspection: `df -h`, `docker system df`, `docker ps -a`, and `docker volume ls`. Any cleanup needs exact named targets, backup/recovery evidence where relevant, and user acceptance. |
 | "Network not found: coolify" | Docker network deleted or corrupted | `docker network create coolify`; restart Coolify |
 | "Image not found" for pre-built | Registry credentials wrong or image tag doesn't exist | Verify registry config and image tag in Coolify |
 | "Healthcheck failed" | App doesn't respond to health check path | Verify health check path returns 200; increase timeout |
@@ -61,7 +61,7 @@
 | "Database connection refused" in Coolify logs | Coolify's internal PostgreSQL is down | `docker restart coolify-db` |
 | Coolify websocket disconnects | Port 6001 blocked by firewall | `ufw allow 6001/tcp` |
 | "Permission denied" when connecting to server | SSH key issue between Coolify and target server | Re-add SSH key in Coolify server settings; check `~/.ssh/authorized_keys` |
-| Coolify update fails mid-way | Network interruption during update | Re-run install script: `curl -fsSL https://cdn.coollabs.io/coolify/install.sh \| bash` |
+| Coolify update fails mid-way | Network interruption during update | Download the exact versioned installer from the official release notes, verify its checksum or signature, inspect it, then run `/tmp/coolify-install-<VERSION>.sh` |
 | Sentinel not reporting metrics | Sentinel container not running | `docker restart coolify-sentinel` |
 
 ## Docker System Issues

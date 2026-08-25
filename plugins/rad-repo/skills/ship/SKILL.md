@@ -14,13 +14,20 @@ allowed-tools: Read Glob Grep Bash Write Edit AskUserQuestion
 
 Close the work with reviewed Git state and repository checks. Invoking `ship` authorizes the commit and push. Do not ask again for those two actions.
 
-## 1. Mechanical context check
+## Companion-skill rule
 
-Run the cheap repository and freshness scans. Report findings. They do not block ship unless they expose a real safety or contract problem.
+RAD Repo Ship owns the exact Git commit and push. RAD Coolify Actions owns platform deployment. RAD Repo Verify Release owns read-only commit-to-production proof.
+
+After a successful push, offer `rad-coolify:coolify-actions` only when the current task needs platform deployment and that exact skill appears in the current available-skill list. Offer `rad-repo:verify-release` only when the current task needs commit-to-production proof and that exact skill appears in the current available-skill list. Ask whether the owner accepts each handoff and wait for acceptance before invoking it. If a skill is absent or the owner declines, report the next step without invoking it. Never invoke a companion silently. Ship still stops after push.
+
+## 1. One context snapshot
+
+Collect Git state, repository signals, freshness, handoff metadata, and phase timing
+with one read-only command. Report findings. They block only for a real safety or
+contract problem.
 
 ```powershell
-python ../../scripts/repo-scan.py . --json --no-record
-python ../../scripts/doc-freshness.py . --json
+python ../../scripts/repo-snapshot.py . --json
 ```
 
 ## 2. Quick wrapup
@@ -44,23 +51,7 @@ git diff --cached --check
 
 Never use `git add -A`. Stage only requested work and wrapup documents. Stop for unrelated paths, conflict markers, or whitespace errors.
 
-## 4. Explain and trust the contract
-
-Run:
-
-```powershell
-python ../../scripts/repo-doctor.py . --json
-```
-
-If validation is missing, fix the declaration with owner approval. If command approval is required, show the exact commands and sources. After explicit approval, run:
-
-```powershell
-python ../../scripts/repo-doctor.py . --approve --json
-```
-
-The approval stays in local Git settings. A changed command requires new approval.
-
-## 5. Run the pre-ship gate
+## 4. Run the pre-ship gate
 
 ```powershell
 python ../../scripts/pre_ship.py . --run-validation --json
@@ -69,6 +60,21 @@ python ../../scripts/pre_ship.py . --run-validation --json
 The gate checks staged blobs, high-confidence secret patterns, protected paths, generated output, file size, reviewed contract changes, local command trust, and validation results.
 
 If `AGENTS.md` or `.rad-repo.json` is staged, show its staged diff and ask the owner to approve that contract change. Then rerun with `--allow-contract-change`. This flag does not bypass other findings.
+
+## 5. Resolve trust only when blocked
+
+The pre-ship report includes resolved validation commands, sources, fingerprint,
+and timing. Do not run doctor on the normal trusted path. If the gate reports
+missing or untrusted validation, run doctor once, show the exact commands and
+sources, and gather all needed owner approvals in one round. After explicit
+approval, run:
+
+```powershell
+python ../../scripts/repo-doctor.py . --approve --json
+python ../../scripts/pre_ship.py . --run-validation --json
+```
+
+The approval stays in local Git settings. A changed command requires new approval.
 
 ## 6. Commit and push
 
@@ -86,6 +92,7 @@ List merged local branches and worktrees. Do not delete them without a separate 
 Shipped: <commit> pushed to <remote/branch>
 Handoff: <fresh / size note>
 Validation: <commands and result>
+Timing: <snapshot, validation, and total ship overhead>
 Working tree: <clean / remaining paths>
 Local leftovers: <count>
 ```

@@ -16,6 +16,10 @@ Covers multi-server deployment, Docker Swarm (experimental), build servers, Cool
 
 > **Stability Warning**: Multi-server and Swarm features are evolving. Some configurations may change between Coolify releases. Always test in staging first.
 
+## Live-change gate
+
+Before a migration, backup restore, server change, or self-update, confirm the exact instance and server, state the action and expected effect, and require user acceptance. For CI, use a protected environment or manual approval. Stop if approval is missing.
+
 ## Multi-Server Architecture
 
 ### How Coolify Multi-Server Works
@@ -221,18 +225,21 @@ echo "Backup completed: $BACKUP_FILE"
    tar -czf /tmp/coolify-migration.tar.gz /data/coolify/
    ```
 
-2. **On new server**: Install Coolify fresh
-   ```bash
-   curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
-   ```
+2. **On new server**: Install the selected Coolify release
+   - Choose a tagged release from the official Coolify release notes.
+   - Download the matching installer to a file from its versioned release URL. Do not pipe a mutable URL to a shell.
+   - Verify the published checksum or signature, inspect the script, then run it with the exact version and target recorded.
 
 3. **Stop fresh Coolify and restore data**:
    ```bash
    cd /data/coolify/source
    docker compose stop
-   rm -rf /data/coolify/*
+   cd /
+   sudo mv /data/coolify /data/coolify-pre-restore-<TIMESTAMP>
+   sudo mkdir /data/coolify
    tar -xzf /tmp/coolify-migration.tar.gz -C /
    ```
+   Keep the pre-restore directory until the restored instance is verified. This makes the change recoverable and avoids a recursive delete.
 
 4. **Start Coolify**:
    ```bash
@@ -252,15 +259,16 @@ echo "Backup completed: $BACKUP_FILE"
 # Recommended: Via UI
 # Settings → Update → Check for updates → Install
 
-# Via CLI
-curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
-
-# To pin a specific version (if latest has issues)
-# Check available versions at github.com/coollabsio/coolify/releases
+# Via a checked installer file
+# 1. Select the exact release from the official Coolify release notes.
+# 2. Download its versioned installer, verify its checksum or signature, and inspect it.
+# 3. Run the local file only after stating the exact server and version.
+sudo bash /tmp/coolify-install-<VERSION>.sh
 ```
 
 **Before updating**:
 - Create a backup of `/data/coolify/`
+- Get user acceptance for the exact server, release, and update action
 - Read the release notes for breaking changes
 - Test in staging if running critical production workloads
 

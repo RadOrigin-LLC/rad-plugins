@@ -73,7 +73,7 @@ Return one JSON code block matching this shape:
     {
       "task_id": "T1 | M1 | O1 | plan-level",
       "category": "anti-pattern | failure-state | dag | tdd | context | stack-arch",
-      "severity": "CRITICAL | HIGH | MEDIUM | LOW",
+      "severity": "CRITICAL | HIGH",
       "issue": "exact issue and cited plan text",
       "anti_pattern_ref": "planning risk number or null",
       "fix": "smallest useful plan change"

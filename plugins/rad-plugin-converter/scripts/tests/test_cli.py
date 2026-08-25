@@ -102,5 +102,24 @@ class CliTests(unittest.TestCase):
         self.assertEqual("created-plugin", portable["name"])
         self.assertTrue((target / "skills" / "create-sample" / "SKILL.md").is_file())
 
+    def test_convert_dry_run_lists_planned_writes_without_changes(self) -> None:
+        before = (self.root / ".codex-plugin" / "plugin.json").read_bytes()
+
+        result = self.run_cli("convert", str(self.root), "--in-place", "--dry-run", "--json")
+        output = json.loads(result.stdout)
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertTrue(output["successful"])
+        self.assertTrue(output["dry_run"])
+        self.assertEqual(["plugin.json"], output["changed_files"])
+        self.assertEqual(before, (self.root / ".codex-plugin" / "plugin.json").read_bytes())
+        self.assertFalse((self.root / "plugin.json").exists())
+
+        human = self.run_cli("convert", str(self.root), "--in-place", "--dry-run")
+        self.assertEqual(0, human.returncode, human.stderr)
+        self.assertIn("Dry run:", human.stdout)
+        self.assertIn("Planned: plugin.json", human.stdout)
+        self.assertNotIn("Converted:", human.stdout)
+
 if __name__ == "__main__":
     unittest.main()

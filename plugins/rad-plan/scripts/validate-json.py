@@ -130,15 +130,91 @@ def _validate(data, schema: dict, path: str, root: dict, errors: list[dict]) -> 
             errors.append({"path": path, "message": f"oneOf matched {matches} schemas, expected 1"})
 
 
+RISK_SCHEMA_ID = "risk-assessment.schema.json"
+STACK_SCHEMA_ID = "stack-eval.schema.json"
+RISK_SEVERITIES = ("CRITICAL", "HIGH", "MEDIUM", "LOW")
+
+
+def _risk_semantic_errors(data: object) -> list[dict]:
+    if not isinstance(data, dict):
+        return []
+
+    errors: list[dict] = []
+    counts = {severity: 0 for severity in RISK_SEVERITIES}
+    for field in ("blocking_issues", "advisory_issues"):
+        issues = data.get(field)
+        if not isinstance(issues, list):
+            continue
+        for index, issue in enumerate(issues):
+            if not isinstance(issue, dict):
+                continue
+            severity = issue.get("severity")
+            if severity in counts:
+                counts[severity] += 1
+            if field == "blocking_issues" and severity in {"MEDIUM", "LOW"}:
+                errors.append({
+                    "path": f"$.blocking_issues[{index}].severity",
+                    "message": "blocking issues must use CRITICAL or HIGH severity",
+                })
+
+    summary = data.get("summary")
+    if isinstance(summary, dict):
+        for severity, actual_count in counts.items():
+            field = f"{severity.lower()}_count"
+            if field in summary and summary[field] != actual_count:
+                errors.append({
+                    "path": f"$.summary.{field}",
+                    "message": f"{field} must match issue arrays ({actual_count})",
+                })
+
+        if data.get("verdict") == "APPROVE":
+            critical_or_high = counts["CRITICAL"] + counts["HIGH"]
+            reported_critical_or_high = sum(
+                summary.get(field, 0)
+                for field in ("critical_count", "high_count")
+                if isinstance(summary.get(field), int) and not isinstance(summary.get(field), bool)
+            )
+            if critical_or_high or reported_critical_or_high:
+                errors.append({
+                    "path": "$.verdict",
+                    "message": "APPROVE cannot include CRITICAL or HIGH issues",
+                })
+
+    return errors
+
+
+def _stack_semantic_errors(data: object) -> list[dict]:
+    if not isinstance(data, dict) or data.get("compatibility_verified") is not True:
+        return []
+    sources = data.get("verification_sources")
+    if not isinstance(sources, list) or not sources:
+        return [{
+            "path": "$.verification_sources",
+            "message": "compatibility_verified requires at least one verification source",
+        }]
+    return []
+
+
+def semantic_validate(data: object, schema: dict) -> list[dict]:
+    schema_id = str(schema.get("$id", ""))
+    if schema_id.endswith(RISK_SCHEMA_ID):
+        return _risk_semantic_errors(data)
+    if schema_id.endswith(STACK_SCHEMA_ID):
+        return _stack_semantic_errors(data)
+    return []
+
+
 def validate(data, schema: dict) -> list[dict]:
     if HAS_JSONSCHEMA:
         validator = jsonschema.Draft7Validator(schema)
-        return [
+        errors = [
             {"path": "/".join(str(p) for p in err.absolute_path) or "$", "message": err.message}
             for err in validator.iter_errors(data)
         ]
-    errors: list[dict] = []
-    _validate(data, schema, "$", schema, errors)
+    else:
+        errors = []
+        _validate(data, schema, "$", schema, errors)
+    errors.extend(semantic_validate(data, schema))
     return errors
 
 

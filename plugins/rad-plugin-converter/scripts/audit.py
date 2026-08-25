@@ -58,6 +58,23 @@ def _relative(path: Path, root: Path) -> str:
         return str(path)
 
 
+def _symlink_component(path: Path, root: Path) -> Path | None:
+    root_absolute = root.absolute()
+    candidate = path.absolute()
+    try:
+        relative = candidate.relative_to(root_absolute)
+    except ValueError:
+        return None
+    current = root_absolute
+    if current.is_symlink():
+        return current
+    for part in relative.parts:
+        current /= part
+        if current.is_symlink():
+            return current
+    return None
+
+
 def _read_json(path: Path) -> tuple[Any | None, Finding | None]:
     try:
         return json.loads(path.read_text(encoding="utf-8-sig")), None
@@ -76,17 +93,20 @@ def _read_json(path: Path) -> tuple[Any | None, Finding | None]:
 def detect_source_types(root: Path) -> tuple[str, ...]:
     types: list[str] = []
     manifest = root / "plugin.json"
-    if manifest.is_file():
+    if _symlink_component(manifest, root) is None and manifest.is_file():
         data, _ = _read_json(manifest)
         if isinstance(data, dict) and data.get("$schema") == PLUGIN_SCHEMA:
             types.append("agent-plugin")
         else:
             types.append("legacy-root")
-    if (root / ".codex-plugin" / "plugin.json").is_file():
+    codex_manifest = root / ".codex-plugin" / "plugin.json"
+    if _symlink_component(codex_manifest, root) is None and codex_manifest.is_file():
         types.append("codex")
-    if (root / ".claude-plugin" / "plugin.json").is_file():
+    claude_manifest = root / ".claude-plugin" / "plugin.json"
+    if _symlink_component(claude_manifest, root) is None and claude_manifest.is_file():
         types.append("claude")
-    if (root / "SKILL.md").is_file():
+    skill = root / "SKILL.md"
+    if _symlink_component(skill, root) is None and skill.is_file():
         types.append("agent-skill")
     return tuple(types)
 
@@ -112,7 +132,26 @@ def _iter_package_entries(root: Path) -> Iterable[Path]:
 def _audit_containment(root: Path) -> list[Finding]:
     findings: list[Finding] = []
     for path in _iter_package_entries(root):
-        if not _inside(path, root):
+        link = _symlink_component(path, root)
+        if link is not None:
+            findings.append(
+                Finding(
+                    "error",
+                    "package-link",
+                    _relative(link, root),
+                    "Refusing to traverse a symbolic link in the package.",
+                )
+            )
+            if not _inside(path, root):
+                findings.append(
+                    Finding(
+                        "error",
+                        "package-path-escape",
+                        _relative(path, root),
+                        "Resolved package path escapes the plugin root.",
+                    )
+                )
+        elif not _inside(path, root):
             findings.append(
                 Finding(
                     "error",
@@ -246,6 +285,9 @@ def _audit_skill_links(skill_dir: Path, plugin_root: Path) -> list[Finding]:
 
 def _audit_skills(root: Path) -> list[Finding]:
     skills = root / "skills"
+    link = _symlink_component(skills, root)
+    if link is not None:
+        return [Finding("error", "package-link", _relative(link, root), "Refusing to traverse a symbolic link in the package.")]
     if not skills.exists():
         return []
     if not skills.is_dir():
@@ -255,6 +297,12 @@ def _audit_skills(root: Path) -> list[Finding]:
     discovered: set[Path] = set()
     for child in sorted(skills.iterdir(), key=lambda path: path.name.lower()):
         skill_path = child / "SKILL.md"
+        link = _symlink_component(child, root) or _symlink_component(skill_path, root)
+        if link is not None:
+            findings.append(
+                Finding("error", "package-link", _relative(link, root), "Refusing to traverse a symbolic link in the package.")
+            )
+            continue
         if child.is_dir() and skill_path.is_file():
             discovered.add(skill_path)
             findings.extend(audit_frontmatter(child, root))
@@ -405,6 +453,9 @@ def _audit_http_server(rel: str, name: str, server: dict[str, Any]) -> list[Find
 
 def _audit_mcp(root: Path) -> list[Finding]:
     path = root / "mcp.json"
+    link = _symlink_component(path, root)
+    if link is not None:
+        return [Finding("error", "package-link", _relative(link, root), "Refusing to traverse a symbolic link in the package.")]
     if not path.exists():
         return []
     rel = _relative(path, root)
@@ -446,6 +497,12 @@ def _client_only_findings(root: Path) -> list[Finding]:
     findings: list[Finding] = []
     for name in sorted(CLIENT_ONLY_NAMES):
         path = root / name
+        link = _symlink_component(path, root)
+        if link is not None:
+            findings.append(
+                Finding("error", "package-link", _relative(link, root), "Refusing to traverse a symbolic link in the package.")
+            )
+            continue
         if path.exists():
             findings.append(
                 Finding(
@@ -490,7 +547,12 @@ def audit_path(path: Path) -> AuditReport:
         )
 
     manifest = root / "plugin.json"
-    if manifest.exists():
+    manifest_link = _symlink_component(manifest, root)
+    if manifest_link is not None:
+        findings.append(
+            Finding("error", "package-link", _relative(manifest_link, root), "Refusing to traverse a symbolic link in the package.")
+        )
+    elif manifest.exists():
         if not manifest.is_file():
             findings.append(Finding("error", "manifest-kind", "plugin.json", "plugin.json must be a regular file."))
         else:

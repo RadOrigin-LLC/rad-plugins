@@ -109,16 +109,14 @@ When deciding where new information goes, evaluate strictly by actionability (mo
 - **Default to the more actionable category on ties.** Project over Area, Area over Resource.
   Better to over-promote toward action than bury something in Archives.
 
-## The 10-to-15 Project Rule
+## Project count guidance
 
-Maintain between 10 and 15 active projects at any given time.
+Project counts are review prompts. Use the bounds configured for the local scanner when
+the owner wants count guidance. A count does not prove system health or decide a file's
+category.
 
-- **More than 15:** Attention too fragmented. Unlikely to make visible progress. Leads to discouragement.
-- **Fewer than 10:** Risk of stalling. Creative blocks and delays are inevitable — you need other projects to switch to.
-
-**If over 15, identify:**
-- **False projects:** Dreams without deadlines or hobbies without goals. Move to Areas, Resources, or someday/maybe.
-- **Mega-projects:** Massive efforts that need to be broken into smaller, achievable phases.
+When the count needs review, check for false projects and mega-projects, then let the
+owner choose whether to keep, pause, demote, or archive an item.
 
 ## How Items Move Between Categories
 
@@ -136,10 +134,11 @@ PARA is a dynamic production system, not a static filing cabinet. Information fl
 **Do NOT** try to sort all your old files into the new folders. This is exhausting and leads to giving up.
 
 **Instead:**
-1. Move ALL existing files into a single folder titled "Archive [today's date]"
-2. This instantly gives you a clean workspace
-3. Pull old files out of the archive via search only when you actually need them
-4. Build new PARA folders organically as new projects and needs emerge
+1. Select **Fresh start** only when that is the approved mode.
+2. Inside the approved root, plan a dated archive for the existing items.
+3. Review and approve the dry-run ledger before any move.
+4. Pull old files out of the archive via search only when you actually need them.
+5. Build new PARA folders organically as new projects and needs emerge.
 
 ## PARA Across Platforms
 

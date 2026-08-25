@@ -32,17 +32,16 @@ For new users just getting started with a digital note-taking app. Commit to you
 
 For users who want to start immediately. This is the minimum viable Second Brain.
 
-### Minute 1-3: Archive Everything
+### Minute 1-3: Choose the mode
 
-Move ALL existing files, notes, and documents into a single folder:
-- Name it: `Archive [today's date]` (e.g., "Archive 2026-03-22")
-- Include: Desktop files, Downloads folder, Documents, notes inbox, cloud drive root
-- Do NOT sort anything. Just move it all into the archive folder.
-- This instantly gives you a clean workspace.
+Use one of the three modes from `para-organize`:
+- **Audit & update:** inspect and report. Do not move files.
+- **Sort into existing:** plan only the loose items that belong in current categories.
+- **Fresh start:** plan a dated archive inside the approved root. Move nothing until the dry-run ledger is approved.
 
 ### Minute 3-5: Create the PARA Structure
 
-Create exactly 4 top-level folders:
+Use four top-level categories. Plain and numbered names are equivalent:
 ```
 📁 1-Projects
 📁 2-Areas
@@ -50,12 +49,8 @@ Create exactly 4 top-level folders:
 📁 4-Archives
 ```
 
-The numbers keep them sorted correctly in any file manager. Mirror these exact 4
-folders in every tool you use:
-- Notes app (Notion, Obsidian, Apple Notes)
-- File system (Documents folder)
-- Cloud drive (Google Drive, OneDrive, Dropbox)
-- Optionally: Email folders, bookmarks
+The numbers are optional. Keep the categories inside the approved root. Inbox and Templates
+are optional support folders. Do not apply a move outside that root.
 
 ### Minute 5-8: List Active Projects
 
@@ -63,12 +58,12 @@ Write down everything you're actively working on that has:
 - A specific goal or outcome (what does "done" look like?)
 - A deadline or timeframe (when does it need to be done?)
 
-Create a subfolder in `1-Projects` for each one.
+Create a subfolder in the selected Projects folder for each approved project.
 
 ### Minute 8-10: Quick Sanity Check
 
-- Do you have between 10 and 15 projects? If way more, some are probably "false
-  projects" (dreams without deadlines). Move them to Areas or Resources.
+- Compare the project count with the scanner's configured advice bounds. Review the list when
+  the count is outside those bounds.
 - Does each project have a clear outcome? "Get healthy" is an Area, not a Project.
   "Complete Couch-to-5K program by June" is a Project.
 
@@ -132,7 +127,7 @@ Run this to harvest reusable knowledge before archiving.
    - Move them to relevant Project, Area, or Resource folders
 
 4. **Archive the project folder**
-   - Move to Archives across all platforms (notes app, file system, cloud)
+   - Inside the approved root, plan the move to Archive/Archives and apply it only through the approved ledger
    - Keeps active workspace uncluttered
 
 5. **Add a status note (if paused/canceled, not completed)**
@@ -160,8 +155,8 @@ Perform every 3-7 days to clear digital workspaces and maintain momentum.
    - Review past week for follow-ups
    - Review upcoming week for preparation needed
 
-3. **Clear computer desktop**
-   - Move accumulated files into appropriate PARA folders
+3. **Review approved-root captures**
+   - Plan accumulated files for PARA folders and apply only through the approved ledger
 
 4. **Clear notes inbox**
    - Give newly captured notes descriptive titles
@@ -186,7 +181,7 @@ Perform to evaluate big-picture priorities and ensure alignment.
    - Archive completed projects
    - Add new ones
    - Ensure active list reflects current reality
-   - Check the 10-15 project rule
+   - Compare the project count with the configured scanner guidance
 
 3. **Review areas of responsibility**
    - Evaluate long-term areas (health, finances, relationships)
@@ -246,14 +241,11 @@ Mega-projects are items so large they should be broken into phases:
 
 Break mega-projects into individual project folders with their own deadlines.
 
-### Step 5: Check the 10-15 Rule
+### Step 5: Check project-count guidance
 
-Count your real projects. Then:
-- **More than 15:** Your attention is too fragmented. Identify 3-5 projects to
-  pause (write a Hemingway Bridge for each) or archive.
-- **Fewer than 10:** You have room for more. Check Areas — is any standard slipping
-  that needs a project? Check Someday/Maybe — is anything ready to activate?
-- **10-15:** You're in the sweet spot.
+Count your real projects and compare the result with the configured scanner bounds.
+Treat a count outside those bounds as a prompt to review priorities, Areas, and
+Someday/Maybe. It is advice, not a health score.
 
 ### Step 6: Prioritize
 
@@ -265,7 +257,7 @@ From your refined list, identify:
 ### Output
 
 You should now have:
-- A clean project list of 10-15 items
+- A project list reviewed against the configured guidance
 - Each with a clear outcome and deadline
 - False projects demoted
 - Mega-projects broken into phases
@@ -310,17 +302,19 @@ A pre-built page used each morning to track the day:
 
 When feeling overwhelmed by digital clutter:
 
-### Step 1: Archive Everything
-- Desktop, Downloads, Documents, cloud drives, notes inbox — move ALL into a single folder titled "Archive [today's date]"
-- Delete nothing; just clear the decks
+### Step 1: Select a reset mode
+- **Audit & update:** inspect the approved root and make no moves.
+- **Sort into existing:** plan only approved-root loose items.
+- **Fresh start:** plan a dated archive inside the approved root, then use the dry-run ledger.
+- Delete nothing. This workflow reads and moves only inside the explicitly approved root.
 
 ### Step 2: Clear Inboxes
 - Archive all emails (or everything older than a week/month)
 - Mark all messaging and social media DMs as read
 
 ### Step 3: Create a Project List
-- Write down 10-15 active projects you are currently committed to
-- This provides instant clarity on true priorities
+- Write down the active projects you are currently committed to.
+- Compare the count with the scanner's configured guidance bounds.
 
 ### Step 4: Turn Off Notifications
 - Shut off non-essential app notifications

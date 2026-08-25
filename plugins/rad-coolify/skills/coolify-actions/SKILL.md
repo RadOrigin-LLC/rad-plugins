@@ -17,12 +17,31 @@ Operational playbooks for managing a Coolify instance using MCP tools. Each work
 
 > **Requires**: The `coolify` MCP server (bundled with this plugin via `@radoriginllc/coolify-mcp`). Set `COOLIFY_URL` to the instance base URL and set `COOLIFY_API_TOKEN` to a team-scoped API token. Never supply a Coolify Private Key as the token. If MCP tools are not available, fall back to the equivalent `curl` commands from the coolify-cicd skill.
 
+> **CLI first**: When the Coolify CLI is installed, run `coolify context verify` and use it for the operation. The documented deployment form is `coolify deploy uuid <APP_UUID>`, with `--force` only when a clean rebuild is required. Use `coolify deploy list` and `coolify deploy get <DEPLOYMENT_UUID>` to verify the result. Run `coolify --help` or the installed command's `--help` for other resource operations because CLI syntax can change.
+
 ## Pre-Flight: Verify Connection
 
 Before any workflow, confirm the MCP connection is live:
 
 1. Call `coolify_healthcheck` and expect a "connected" response. It uses root-level `/api/health`, outside `/api/v1`.
 2. If it fails, the MCP server is misconfigured or the Coolify instance is unreachable
+
+## Mutation gate
+
+Before any deploy, start, stop, restart, cancel, rollback, create, update, or delete operation:
+
+1. Confirm the exact instance base URL and team.
+2. Resolve the exact resource name and UUID, then read its current state.
+3. State the exact action and expected effect.
+4. Ask for explicit user acceptance of that exact instance, resource, and action.
+
+Do not call a mutating MCP, CLI, or API operation before user acceptance. If the target or requested action is unclear, remain read-only.
+
+## Companion-skill rule
+
+RAD Repo Ship owns the exact Git commit and push. Coolify Actions owns platform deployment. RAD Repo Verify Release owns read-only commit-to-production proof.
+
+Offer `rad-repo:ship` only when the current task needs a reviewed repository commit and push, and that exact skill appears in the current available-skill list. Offer `rad-repo:verify-release` only when the current deployment needs commit-to-production proof, and that exact skill appears in the current available-skill list. Ask whether the user accepts each handoff and wait for acceptance before invoking it. If a skill is absent or the user declines, continue this workflow and report the missing next step. Never invoke a companion silently.
 
 ## Workflow 1: Discover What's Running
 
@@ -47,7 +66,7 @@ Present results as a summary table: name, status, type, domain.
 
 ```
 Step 1: coolify_list_applications          → find the app UUID
-Step 2: coolify_deploy(uuid: "<APP_UUID>") → trigger deploy, capture deployment_uuid
+Step 2: coolify_deploy(uuid: "<APP_UUID>") or `coolify deploy uuid <APP_UUID>` → trigger deploy, capture deployment_uuid
 Step 3: coolify_get_deployment(uuid: "<DEPLOYMENT_UUID>")  → poll status
 ```
 
@@ -167,7 +186,7 @@ For CPU/memory/disk metrics, the Coolify API does not expose Sentinel data — a
 **Databases**: `coolify_start_database`, `coolify_stop_database`, `coolify_restart_database`
 **Services**: `coolify_start_service`, `coolify_stop_service`, `coolify_restart_service`
 
-Always confirm with the user before stopping production resources.
+Apply the mutation gate before every lifecycle change. Stopping a production resource needs explicit user acceptance after the exact instance, resource UUID, and action are stated.
 
 ## Workflow 9: Rollback a Deployment
 
@@ -176,8 +195,9 @@ Always confirm with the user before stopping production resources.
 ```
 Step 1: coolify_list_deployments(uuid: "<APP_UUID>", take: 10)  → find last successful deploy
 Step 2: Identify the commit SHA or image tag from the last "finished" deployment
-Step 3: coolify_update_application(uuid: "<APP_UUID>", settings: {"docker_registry_image_tag": "<PREVIOUS_TAG>"})
-Step 4: coolify_deploy(uuid: "<APP_UUID>")
+Step 3: State the exact instance, application UUID, previous image or commit, and rollback action. Ask for user acceptance.
+Step 4: coolify_update_application(uuid: "<APP_UUID>", settings: {"docker_registry_image_tag": "<PREVIOUS_TAG>"})
+Step 5: coolify_deploy(uuid: "<APP_UUID>")
 ```
 
 **Limitation**: Rollback only works if the previous Docker image still exists locally on the server. Automated Docker cleanup may have pruned it.

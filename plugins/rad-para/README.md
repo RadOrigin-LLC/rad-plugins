@@ -1,6 +1,6 @@
 # RAD PARA
 
-RAD PARA is an Agent Plugins 1.0.0 package that helps one person set up, review, and use a PARA-based note system with Codex. It can make suggestions and approved local file moves, but it can misclassify notes when context is thin.
+RAD PARA is an Agent Plugins 1.0.0 package that helps one person set up, review, and use a PARA-based note system with Codex. It can make suggestions and apply approved local file moves through a dry-run ledger. Sparse context can still lead to a wrong classification.
 
 It is best suited to folders and Markdown notes that Codex can read. It can also give instructions for tools such as Notion, Obsidian, Apple Notes, or Google Drive, but this plugin does not connect to those services or change their data through an API.
 
@@ -33,7 +33,8 @@ The filesystem reorganization path has a stricter rule:
 3. Read only enough content to classify unclear items.
 4. Show every folder to create and every file to move.
 5. Wait for explicit approval.
-6. Move approved items without deleting them, then write a PARA-Inventory.md file.
+6. Run the approved dry-run ledger through `scripts/para_move.py`.
+7. Keep the ledger and report any failed or restored paths.
 
 The audit and weekly-review skills stay read-only.
 
@@ -46,9 +47,19 @@ python .\scripts\audit-para-structure.py <para-root>
 python .\scripts\audit-para-structure.py <para-root> --strict --json
 ~~~
 
-It checks the four top-level folders, root-level orphan files, project names that look like topics, optional outcome markers, and project-count notices.
+It checks the four top-level categories, plain or numbered names, root-level orphan files, project names that look like topics, optional outcome markers, and configurable project-count advice. `Archive` and `Archives` are equivalent. `Inbox` and `Templates` are optional. The scan stays inside the supplied root, skips links, and reports incomplete reads.
 
 The script does less than the conversational audit skill. It does not inspect full note meaning, staleness, deadlines, archive health, or cross-platform copies.
+
+## Safe file moves
+
+`scripts/para_move.py` accepts one approved root and a list of source and target paths. The dry run writes an unapproved JSON ledger. A separate approval step is required before apply. Apply rejects escapes, collisions, and links, stops on the first failure, and records restoration results in the retained ledger.
+
+~~~powershell
+python .\scripts\para_move.py --root <para-root> --move <source> <target> --dry-run --ledger <ledger>
+python .\scripts\para_move.py --root <para-root> --ledger <ledger> --approve
+python .\scripts\para_move.py --root <para-root> --ledger <ledger> --apply
+~~~
 
 ## What is specific about it
 
@@ -76,7 +87,7 @@ The real-file workflow also requires one complete move plan before any reorganiz
 - Cross-platform consistency can be checked only when the user gives access to each copy.
 - The user remains responsible for backups and final file placement.
 
-When RAD Repo is installed, the Hemingway Bridge skill can place PARA context into a repository handoff. RAD Repo owns the Git-based handoff when both workflows apply.
+When a Git-based handoff could help, RAD Repo is optional. Offer the exact needed `rad-repo:<skill>` only when that skill appears in the current available-skill list and the current task needs it. Invoke it only after the user accepts. If the exact skill is absent or the user declines, keep the bridge standalone and follow this plugin's handoff instructions.
 
 ## Install
 

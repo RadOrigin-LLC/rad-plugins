@@ -16,7 +16,7 @@ allowed-tools: Read Glob Grep Bash
 
 # Startup — orient, fast and read-only
 
-Get oriented at the top of a session (target: under 30 seconds). **Read-only and
+Get oriented at the top of a session. **Read-only and
 lean** — read the docs and git state, report trust, state the next task, stop. This
 is not onboarding (`repo-init` / `adopt`) and not an audit (`repo-align`).
 
@@ -33,14 +33,11 @@ is not onboarding (`repo-init` / `adopt`) and not an audit (`repo-align`).
 
 ## Procedure
 
-1. **Gather evidence** (read-only), in one batch — git state plus the two cheap
-   mechanical scans (`python` on Windows / PowerShell, `python3` elsewhere):
+1. **Gather evidence** with one read-only snapshot (`python` on Windows / PowerShell,
+   `python3` elsewhere):
 
    ```bash
-   git status --short
-   git branch --show-current
-   python3 ../../scripts/repo-scan.py . --json --no-record
-   python3 ../../scripts/doc-freshness.py . --json
+   python3 ../../scripts/repo-snapshot.py . --json
    ```
 
    (If Python is unavailable, compute commits-behind by hand with
@@ -55,14 +52,16 @@ is not onboarding (`repo-init` / `adopt`) and not an audit (`repo-align`).
    - **Established but un-managed** — real code/history but no doc model →
      recommend `adopt` and stop.
    - **Managed repo** — orient (below).
-3. **Read L0/L1 + direction**: report the `.rad-repo.json` workflow profile, defaulting
-   to `core`. Read applicable `AGENTS.md` files, `docs/handoff.md`, and
-   `docs/plan.md` if present, in one parallel batch. If the plan links an active
-   initiative that owns the next task, read that one initiative. Read nothing else
-   by default. When the profile is `full` or the user asks for a full startup, also
-   read `docs/prd.md` and search decisions/lessons for entries tied to the current
-   task. Do not load unrelated history.
-4. **Build the trust report** from the doc-freshness JSON (`trust` block) — one line
+3. **Read L0/L1 + direction**: report the snapshot profile. Read applicable
+   `AGENTS.md` files and `docs/handoff.md` in one batch. When handoff schema 2 is
+   fresh and supplies `active_task` plus `next_action`, do not read the plan. Read
+   `docs/plan.md` only when the handoff is missing, stale, legacy, or links a plan
+   section needed to understand the next action. Read one linked active initiative
+   when it owns the task.
+4. **Recall only relevant durable memory**: when the next action names a component,
+   path, past choice, or prior failure, run `memory-recall.py` with that subject and
+   path. Return at most five records. Skip recall when it adds no task value.
+5. **Build the trust report** from the snapshot freshness JSON (`trust` block) — one line
    per managed doc that exists, measured in **commits-behind** (commits on HEAD since
    the doc's last modifying commit). Thresholds (from
    `references/shelf-spec.md`): handoff 0–3 green · 4–10 yellow (nudge a quick
@@ -71,7 +70,7 @@ is not onboarding (`repo-init` / `adopt`) and not an audit (`repo-align`).
    (commits-behind, no verdict). Add the repo-scan line: loose docs and any L0/L1
    size-budget overage. Grounded counts and file names, not impressions. If the
    handoff is stale, treat its resume point with suspicion and say so.
-5. **Surface the briefing** (format below) and **end with the next task from the
+6. **Surface the briefing** (format below) and **end with the next task from the
    handoff** — that line is the deliverable. The only forward actions you may
    suggest: `repo-init` (fresh), `adopt` (un-managed), a quick `wrapup` (yellow
    handoff), or `repo-align` (red / drift).
@@ -93,6 +92,7 @@ Hygiene:          <from repo-scan: "tidy" | "N loose ends: <names>" | budget ove
 Instructions:     <root only | root + scoped overlays for current focus>
 Current focus:    <from docs/plan.md, one line, if present>
 Deferred:         <count of items in the handoff's Deferred ledger, or "none">
+Recall:           <N relevant records / not needed>
 Next task:        <the Next action from docs/handoff.md — the last line of the briefing>
 ```
 

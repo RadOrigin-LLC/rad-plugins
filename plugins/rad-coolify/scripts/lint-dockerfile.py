@@ -232,14 +232,14 @@ def lint(text: str, strict: bool) -> list[Finding]:
             if stripped_value and stripped_value not in ("placeholder", "change-me", "TODO", "REPLACE_ME"):
                 findings.append(Finding(
                     severity="CRITICAL", category="security", line=lineno,
-                    message=f"ENV '{env_name}={stripped_value[:30]}...' may be a hardcoded secret baked into image",
+                    message=f"ENV '{env_name}' may be a hardcoded secret baked into image",
                     fix=f"Don't set secrets via ENV in Dockerfile. Set them via Coolify UI environment variables "
                         "(scoped Build / Runtime separately).",
                 ))
         elif SECRET_LIKE_VALUE.search(env_value):
             findings.append(Finding(
                 severity="CRITICAL", category="security", line=lineno,
-                message=f"ENV value at line {lineno} contains a secret-shaped string",
+                message=f"ENV '{env_name}' contains a secret-shaped value",
                 fix="Move to runtime env via Coolify UI; never commit secrets in Dockerfile.",
             ))
 

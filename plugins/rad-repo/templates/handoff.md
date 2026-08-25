@@ -1,8 +1,13 @@
+---
+rad_repo_handoff: 2
+updated: <YYYY-MM-DD>
+branch: <branch>
+head: <full commit SHA or none>
+worktree: <clean / dirty summary>
+active_task: <task ID or short label>
+next_action: <one exact action>
+---
 # Handoff
-
-**Updated:** <YYYY-MM-DD>
-**Branch:** <branch>
-**Working tree:** <clean / dirty summary>
 
 <!-- A snapshot, not a log. Refreshed by /wrapup or /ship from git evidence.
      Target ≤60 lines while preserving facts needed to resume. History lives in git and docs/archive/. Anything
@@ -26,6 +31,12 @@
 ## Validation
 
 <Commands run this session and their result, or "Not run this session.">
+
+## Resume anchors
+
+- Commit: <full SHA or none>
+- Changed paths: <paths or none>
+- Active initiative: <path or none>
 
 ## Watchouts
 

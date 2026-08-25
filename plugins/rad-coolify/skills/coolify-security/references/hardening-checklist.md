@@ -1,5 +1,9 @@
 # Coolify Security Hardening Checklist
 
+## Live-change gate
+
+Before changing host access or firewall rules, confirm the exact instance and server, state the action and expected effect, and require user acceptance. Use a protected environment or manual approval for CI and stop without approval.
+
 ## Server-Level Hardening
 
 ### 1. SSH Configuration
@@ -46,9 +50,15 @@ sudo ufw enable
 Without this, Docker bypasses all UFW rules:
 
 ```bash
-wget -O /usr/local/bin/ufw-docker \
-  https://github.com/chaifeng/ufw-docker/raw/master/ufw-docker
-chmod +x /usr/local/bin/ufw-docker
+# Select a tagged release, download its asset to a file, verify its published
+# SHA-256 checksum, inspect it, then install the exact file.
+VERSION="<VERIFIED_RELEASE_TAG>"
+EXPECTED_SHA256="<SHA256_FROM_OFFICIAL_RELEASE>"
+curl --fail --location --output "/tmp/ufw-docker-${VERSION}" \
+  "https://github.com/chaifeng/ufw-docker/releases/download/${VERSION}/ufw-docker"
+ACTUAL_SHA256=$(sha256sum "/tmp/ufw-docker-${VERSION}" | cut -d' ' -f1)
+test "$ACTUAL_SHA256" = "$EXPECTED_SHA256"
+sudo install -m 0755 "/tmp/ufw-docker-${VERSION}" /usr/local/bin/ufw-docker
 
 # Install the iptables rules
 sudo ufw-docker install

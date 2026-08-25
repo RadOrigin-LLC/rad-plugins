@@ -12,7 +12,7 @@ class PluginContractTests(unittest.TestCase):
 
     def test_manifest_and_public_skill_name_match_4_1(self):
         manifest = json.loads(self.read(".codex-plugin/plugin.json"))
-        self.assertEqual("4.1.1", manifest["version"])
+        self.assertEqual("4.1.2", manifest["version"])
         self.assertTrue((PLUGIN_ROOT / "skills" / "software-design" / "SKILL.md").is_file())
         self.assertFalse((PLUGIN_ROOT / "skills" / "design-sprint" / "SKILL.md").exists())
 
@@ -42,6 +42,76 @@ class PluginContractTests(unittest.TestCase):
             "session-output.md",
         ):
             self.assertIn(phrase, skill)
+
+    def test_behavior_cases_have_matching_source_contracts(self):
+        cases = self.read("tests/behavior-cases.md").lower()
+        case_contracts = {
+            "user-input-before-suggestions": (
+                "ask what the user has considered before offering ideas",
+                "keep the user's starting ideas ahead of ai suggestions",
+            ),
+            "stable-idea-ids": (
+                "assign every idea a stable id such as `i1`",
+                "preserve the original id and wording when ideas are grouped",
+                "ask before merging ideas that differ in audience, mechanism, channel, cost, or risk",
+            ),
+            "disclosed-source-labels": (
+                "label each idea `[user]`, `[ai]`, or `[research]`",
+                "keep source labels attached when ideas are grouped or evaluated",
+                "keep user ideas visible in the final result",
+            ),
+            "saved-repository-path": (
+                "repeat the exact repository path",
+                "ask for user approval before writing",
+                "do not silently substitute a destination",
+                "keep `docs/design.md` protected",
+            ),
+            "user-provided-research-or-design-evidence": (
+                "read user-provided research or design evidence from the path or content the user names",
+                "keep the exact path or link, claims, and source label",
+                "mark conflicts and unknowns instead of inventing support",
+                "ask before adding outside research",
+            ),
+            "stop-before-plan-or-code": (
+                "stop before implementation planning or code",
+                "offer a planning companion only under the companion-skill rule",
+            ),
+            "companion-loaded-skill-and-user-acceptance": (
+                "match the exact skill name against the current available-skill list",
+                "ask whether the user accepts the companion",
+                "invoke it only after the user asks or accepts",
+                "continue without it when the exact skill is absent or the user declines",
+            ),
+        }
+        for case_id, phrases in case_contracts.items():
+            self.assertIn(f"## {case_id}", cases)
+            for phrase in phrases:
+                self.assertIn(phrase, cases)
+
+        session = self.read("skills/brainstorm-session/SKILL.md").lower()
+        design = self.read("skills/software-design/SKILL.md").lower()
+        for phrase in (
+            "ask what the user has considered before offering ideas",
+            "preserve the user's wording, original ids, and source labels",
+            "[user]",
+            "[ai]",
+            "[research]",
+            "user-provided research or design evidence",
+            "repeat the exact repository path",
+            "do not silently substitute a destination",
+            "stop before implementation planning or code",
+        ):
+            self.assertIn(phrase, session)
+
+        self.assertIn("user-provided research or design evidence", design)
+        self.assertIn("repeat the exact repository path", design)
+        self.assertIn("mark conflicts and unknowns instead of inventing support", design)
+        self.assertIn("stop before implementation planning or code", design)
+        for source in (session, design):
+            self.assertIn("the exact skill appears in the current available-skill list", source)
+            self.assertIn("user accepts", source)
+        self.assertIn("if the exact skill is absent or the user declines, continue the current brainstorm workflow standalone", session)
+        self.assertIn("if the exact skill is absent or the user declines, continue the current software-design workflow standalone", design)
 
     def test_evaluation_workflow_protects_distinctions_and_sets_proof_thresholds(self):
         skill = self.read("skills/idea-evaluation/SKILL.md").lower()

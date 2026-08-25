@@ -17,6 +17,10 @@ Covers Sentinel monitoring, notification channels, log drains, external monitori
 
 > **Self-Hosted Only**: All content assumes self-hosted Coolify v4.x. Monitoring and log drain features may differ on Coolify Cloud.
 
+## Live-change gate
+
+Before deploying monitoring resources or changing notifications, log drains, or alert settings, confirm the exact instance and resource, state the action and expected effect, and require user acceptance. For CI, use a protected environment or manual approval. Stop if approval is missing.
+
 ## Observability Architecture
 
 ```
@@ -227,11 +231,11 @@ For advanced monitoring, deploy a Prometheus + Grafana stack alongside Coolify:
 4. Add Prometheus as a Grafana data source
 5. Import Docker/container monitoring dashboards
 
-**cAdvisor setup** (container metrics for Prometheus):
+**cAdvisor setup** (container metrics for Prometheus). Pin the image to a reviewed release or digest before deployment. The example uses a versioned tag and still requires a current release check:
 ```yaml
 services:
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:v0.52.1
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro

@@ -26,8 +26,8 @@ TABLE_COMMAND_RE = re.compile(
 )
 PLACEHOLDER_COMMANDS = {"<command>", "none", "n/a", "not configured", "not applicable"}
 IGNORED_INSTRUCTION_DIRS = {
-    ".git", ".hg", ".svn", ".next", ".venv", "build", "coverage", "dist",
-    "node_modules", "target", "vendor",
+    ".git", ".hg", ".svn", ".next", ".venv", ".worktrees", "build",
+    "coverage", "dist", "fixtures", "node_modules", "target", "templates", "vendor",
 }
 
 
@@ -66,7 +66,7 @@ def all_instruction_files(root: Path) -> list[Path]:
     files: list[Path] = []
     for path in root.rglob("AGENTS.md"):
         relative = path.relative_to(root)
-        if any(part in IGNORED_INSTRUCTION_DIRS for part in relative.parts[:-1]):
+        if _is_ignored_instruction_path(relative):
             continue
         try:
             path.resolve().relative_to(root)
@@ -75,6 +75,10 @@ def all_instruction_files(root: Path) -> list[Path]:
         if path.is_file():
             files.append(path)
     return sorted(files)
+
+
+def _is_ignored_instruction_path(relative: Path) -> bool:
+    return any(part in IGNORED_INSTRUCTION_DIRS for part in relative.parts[:-1])
 
 
 def applicable_instruction_files(root: Path, target: str | Path) -> list[Path]:
@@ -94,7 +98,14 @@ def applicable_instruction_files(root: Path, target: str | Path) -> list[Path]:
     for part in parent.parts:
         current /= part
         candidates.append(current / "AGENTS.md")
-    return [path for path in candidates if path.is_file()]
+    applicable: list[Path] = []
+    for path in candidates:
+        candidate_relative = path.relative_to(root)
+        if _is_ignored_instruction_path(candidate_relative):
+            continue
+        if path.is_file():
+            applicable.append(path)
+    return applicable
 
 
 def commands_from_instruction(path: Path) -> list[str]:
@@ -129,6 +140,7 @@ def _matches_scope(path: str, scope: str) -> bool:
 def validation_plan(contract: RepositoryContract, changed_paths: list[str]) -> dict:
     command_entries: list[dict] = []
     instruction_map: dict[str, list[str]] = {}
+    matched_paths: set[str] = set()
 
     def add(command: str, source: str) -> None:
         if command and not any(entry["command"] == command for entry in command_entries):
@@ -142,7 +154,10 @@ def validation_plan(contract: RepositoryContract, changed_paths: list[str]) -> d
             for instruction in instructions
         ]
         for instruction in instructions:
-            for command in commands_from_instruction(instruction):
+            instruction_commands = commands_from_instruction(instruction)
+            if instruction_commands and target in changed_paths:
+                matched_paths.add(target)
+            for command in instruction_commands:
                 add(command, instruction.relative_to(contract.root).as_posix())
 
     validation = contract.config.get("validation", {})
@@ -153,14 +168,27 @@ def validation_plan(contract: RepositoryContract, changed_paths: list[str]) -> d
         raise ValueError("validation.commands must be a list of strings")
     for command in root_commands:
         add(command, f"{contract.config_path.name}#validation.commands")
+    if root_commands:
+        matched_paths.update(changed_paths)
 
     scopes = validation.get("scopes", {})
     if not isinstance(scopes, dict):
         raise ValueError("validation.scopes must be an object")
     for scope, scoped_commands in scopes.items():
+        if not isinstance(scope, str) or not scope.strip():
+            raise ValueError("validation.scopes keys must be non-empty paths")
         if not isinstance(scoped_commands, list) or not all(isinstance(item, str) for item in scoped_commands):
             raise ValueError(f"validation.scopes.{scope} must be a list of strings")
+        scope_path = (contract.root / Path(scope)).resolve(strict=False)
+        try:
+            scope_path.relative_to(contract.root)
+        except ValueError as error:
+            raise ValueError(f"validation scope target is outside repository: {scope}") from error
+        if not scope_path.exists():
+            raise ValueError(f"validation scope target does not exist: {scope}")
         if any(_matches_scope(path, scope) for path in changed_paths):
+            if scoped_commands:
+                matched_paths.update(path for path in changed_paths if _matches_scope(path, scope))
             for command in scoped_commands:
                 add(command, f"{contract.config_path.name}#validation.scopes.{scope}")
 
@@ -172,6 +200,7 @@ def validation_plan(contract: RepositoryContract, changed_paths: list[str]) -> d
         "instruction_map": instruction_map,
         "commands": command_entries,
         "allow_empty": allow_empty,
+        "unmatched_paths": [path for path in changed_paths if path not in matched_paths],
     }
 
 
@@ -230,6 +259,7 @@ def main() -> int:
             "validation_commands": [entry["command"] for entry in plan["commands"]],
             "command_sources": plan["commands"],
             "allow_empty": plan["allow_empty"],
+            "unmatched_paths": plan["unmatched_paths"],
             "validation_fingerprint": fingerprint,
             "validation_trusted": (
                 not plan["commands"] and plan["allow_empty"]

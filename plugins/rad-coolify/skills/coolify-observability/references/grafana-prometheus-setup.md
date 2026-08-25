@@ -1,5 +1,9 @@
 # Grafana + Prometheus Setup for Coolify
 
+## Live-change gate
+
+Before deploying monitoring resources or changing scrape targets, confirm the exact instance and resource, state the action and expected effect, and require user acceptance. Use a protected environment or manual approval for CI and stop without approval.
+
 ## Architecture
 
 ```

@@ -4,7 +4,7 @@ RAD Plugin Converter is itself an Agent Plugins 1.0.0 package. It creates, audit
 
 It is for plugin authors who need to move a Claude Code, Codex, mixed, legacy, or standalone Agent Skill package toward the portable format. It does not convert an ordinary application repository into a plugin.
 
-The Agent Plugins 1.0.0 specification is a working draft. This package pins its checks to that version.
+The Agent Plugins 1.0.0 specification is published. Agent Plugins 1.1.0 is a working draft. This package pins its checks to version 1.0.0.
 
 ## Skills
 
@@ -41,6 +41,8 @@ python .\scripts\rad_plugin_converter.py convert <claude-source> --target <new-p
 python .\scripts\rad_plugin_converter.py marketplace <marketplace-root> --json
 python .\scripts\rad_plugin_converter.py marketplace <marketplace-root> --apply --json
 ```
+
+Add `--dry-run` to `create`, `convert`, or `marketplace` to list planned paths without writing files. Human-readable output labels these paths as `Planned`.
 
 `marketplace` is read-only unless `--apply` is present. The tool does not make network calls.
 

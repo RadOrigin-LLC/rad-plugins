@@ -18,6 +18,10 @@ Covers secrets management, RBAC, network isolation, resource limits, and access 
 
 > **Self-Hosted Responsibility**: Coolify self-hosted means YOU own server security. Coolify manages application-layer orchestration, not OS-level hardening.
 
+## Live-change gate
+
+Before changing secrets, permissions, networks, firewall rules, terminal access, or resource limits, confirm the exact instance, resource or server target, action, and expected effect. Ask for explicit user acceptance before the write. Keep audits and discovery read-only.
+
 ## Secrets Management
 
 ### Three Types of Secrets in Coolify
@@ -78,29 +82,15 @@ COPY . .
 RUN npm run build
 ```
 
-### Shared Variables (project, environment, team, server scopes)
+### Shared Variables
 
-> **New in beta.471 (April 2026):** Coolify expanded shared variables to four scopes with explicit interpolation syntax. Earlier versions only supported project-level shared variables.
+Shared-variable scopes and interpolation syntax can change between Coolify releases. Check the instance at use time:
 
-**Four scopes available:**
+1. Run `coolify context verify` and read the exact instance version.
+2. Inspect the current project, environment, team, and server settings for the scopes exposed there.
+3. Use only the interpolation syntax shown by that instance, and redeploy the affected resources after a change.
 
-| Scope | Where | Interpolation syntax | Use case |
-|---|---|---|---|
-| **Server** | Server settings | `{{server.VAR}}` | Variables specific to one host (e.g., `BACKUP_S3_BUCKET` per server) |
-| **Team** | Team settings | `{{team.VAR}}` | Org-wide values (e.g., `MONITORING_API_KEY`) |
-| **Project** | Project → Shared Variables | `{{project.VAR}}` | Project-wide config (e.g., `STRIPE_PUBLISHABLE_KEY` shared across services) |
-| **Environment** | Project → Environment | `{{environment.VAR}}` | Per-environment overrides (`{{environment.DATABASE_URL}}` differs between staging and production) |
-
-**Reference example:**
-```
-DATABASE_URL={{environment.DATABASE_URL}}
-STRIPE_KEY={{project.STRIPE_PUBLISHABLE_KEY}}
-SLACK_WEBHOOK={{team.SLACK_DEPLOY_WEBHOOK}}
-```
-
-**Rotation:** Update the shared variable and redeploy affected applications. There is no automatic propagation — redeployment is required. Plan rotation around your deployment cadence.
-
-**Older Coolify versions:** Only project-level shared variables exist; the team/environment/server scopes are unavailable. Verify `coolify_version` MCP tool returns ≥ beta.471 before relying on them.
+Do not copy a scope or syntax from an older guide into a production environment without this check.
 
 ## RBAC (Role-Based Access Control)
 
@@ -129,9 +119,9 @@ Coolify v4 RBAC operates at the **team** level:
 - No per-resource permissions (e.g., "admin can deploy app A but not app B") — planned for v4 stable or v5
 - No custom roles (only Owner/Admin/Member)
 - No SAML/LDAP/OIDC natively — only OAuth via GitHub, GitLab, Google, Azure, Bitbucket
-- No audit log for who changed what (environment variables, settings) — Issue #2525
+- Confirm the current instance audit and activity features before relying on them for change tracking.
 - Terminal access is all-or-nothing per server (cannot selectively disable for Members while keeping it for Admins)
-- All env vars in Docker Compose projects are injected into ALL containers — Issue #7655 (deferred to v5)
+- Review environment-variable scope for every Compose service on the exact instance before deployment.
 
 **Workaround for per-app isolation**: Create separate teams for each project or security boundary. Each team has its own resources and RBAC.
 
@@ -184,11 +174,18 @@ Docker modifies `iptables` directly, bypassing UFW rules. This means:
 # Then restart Docker: systemctl restart docker
 # WARNING: This breaks inter-container networking; requires manual iptables rules
 
-# Option 2 (Recommended): Use ufw-docker utility
-# https://github.com/chaifeng/ufw-docker
-wget -O /usr/local/bin/ufw-docker https://github.com/chaifeng/ufw-docker/raw/master/ufw-docker
-chmod +x /usr/local/bin/ufw-docker
-ufw-docker install
+# Option 2 (Recommended): Use ufw-docker utility after a checked install.
+# 1. Select a tagged release in the official ufw-docker repository.
+# 2. Download its release asset to a temporary file. Do not pipe a remote URL to a shell.
+# 3. Verify the published SHA-256 checksum, inspect the file, then install it:
+VERSION="<VERIFIED_RELEASE_TAG>"
+EXPECTED_SHA256="<SHA256_FROM_OFFICIAL_RELEASE>"
+curl --fail --location --output "/tmp/ufw-docker-${VERSION}" \
+  "https://github.com/chaifeng/ufw-docker/releases/download/${VERSION}/ufw-docker"
+ACTUAL_SHA256=$(sha256sum "/tmp/ufw-docker-${VERSION}" | cut -d' ' -f1)
+test "$ACTUAL_SHA256" = "$EXPECTED_SHA256"
+sudo install -m 0755 "/tmp/ufw-docker-${VERSION}" /usr/local/bin/ufw-docker
+sudo ufw-docker install
 
 # Allow specific access
 ufw-docker allow <CONTAINER_NAME> 5432/tcp
@@ -199,7 +196,7 @@ ufw-docker allow <CONTAINER_NAME> 5432/tcp from 203.0.113.50
 
 - Bind database ports to `127.0.0.1` only: `127.0.0.1:5432:5432` (not `0.0.0.0:5432:5432`)
 - Use SSH tunnels for remote database access instead of exposing ports
-- Install `ufw-docker` to make UFW rules apply to Docker containers
+- Install a checked, versioned `ufw-docker` release to make UFW rules apply to Docker containers
 
 ## Resource Limits
 

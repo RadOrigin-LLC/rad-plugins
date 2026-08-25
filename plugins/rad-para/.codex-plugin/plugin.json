@@ -1,7 +1,7 @@
 {
   "name": "rad-para",
-  "version": "1.1.2",
-  "description": "An Agent Plugins 1.0.0 package for one-person PARA organization, reviews, summaries, and handoffs. It has no sync service or app connector and can misclassify sparse notes.",
+  "version": "1.1.3",
+  "description": "Guidance for one-person PARA organization, reviews, summaries, and handoffs. It has no sync service or app connector and can misclassify sparse notes.",
   "author": {
     "name": "RAD",
     "url": "https://github.com/radesjardins"
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "RAD PARA",
     "shortDescription": "Review and organize a local PARA note system.",
-    "longDescription": "RAD PARA is an Agent Plugins 1.0.0 package with Codex marketplace metadata for one-person PARA work. It provides organization guidance, read-only structural audits, weekly reviews, Progressive Summarization, output assembly, session handoffs, and a 12 Favorite Problems workshop. File moves require an approved plan. It has no sync engine, scheduler, or live app connector, and thin context can lead to wrong classifications.",
+    "longDescription": "Guidance for one-person PARA work: organization, read-only audits, reviews, summaries, output assembly, handoffs, and file moves through an approved ledger. It has no sync service, scheduler, or app connector, and sparse context can cause wrong classifications.",
     "developerName": "RAD",
     "category": "Productivity",
     "capabilities": [

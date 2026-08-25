@@ -22,7 +22,9 @@ VERSION_RE = re.compile(r"rad-repo-doc-model:\s*([0-9]+)")
 REQUIRED_RESOURCES = (
     "references/shelf-spec.md",
     "scripts/code-hotspots.py",
+    "scripts/memory-recall.py",
     "scripts/pre_ship.py",
+    "scripts/repo-snapshot.py",
     "scripts/repo-doctor.py",
     "scripts/repo_contract.py",
     "templates/AGENTS.md",
@@ -36,6 +38,7 @@ REQUIRED_RESOURCES = (
     "skills/ship/SKILL.md",
     "skills/doctor/SKILL.md",
     "skills/complexity-audit/SKILL.md",
+    "skills/recall/SKILL.md",
 )
 
 
@@ -84,7 +87,10 @@ def main() -> int:
         paths = args.paths or git_paths(root)
         plan = validation_plan(contract, paths)
         fingerprint = validation_fingerprint(plan)
-        missing_validation = not plan["commands"] and not plan["allow_empty"]
+        missing_validation = (
+            not plan["allow_empty"]
+            and (not plan["commands"] or bool(plan["unmatched_paths"]))
+        )
         if args.approve:
             if missing_validation:
                 raise ValueError("no validation commands were found and allow_empty is false")
@@ -104,6 +110,7 @@ def main() -> int:
             "instruction_map": plan["instruction_map"],
             "commands": plan["commands"],
             "allow_empty": plan["allow_empty"],
+            "unmatched_paths": plan["unmatched_paths"],
             "validation_missing": missing_validation,
             "validation_fingerprint": fingerprint,
             "validation_trusted": trusted,
@@ -123,7 +130,9 @@ def main() -> int:
         print(f"Profile: {report['profile']}")
         for entry in report["commands"]:
             print(f"Validate: {entry['command']} [{entry['source']}]")
-        if report["validation_missing"]:
+        if report["unmatched_paths"]:
+            print(f"BLOCK: unmatched changed paths: {', '.join(report['unmatched_paths'])}")
+        elif report["validation_missing"]:
             print("BLOCK: no validation commands were found and allow_empty is false")
         elif report["approval_required"]:
             print("APPROVAL NEEDED: review the commands, then rerun with --approve")

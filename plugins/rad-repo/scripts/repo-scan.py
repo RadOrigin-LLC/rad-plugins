@@ -68,8 +68,8 @@ SEVERITY_RED = 5
 NUDGE_COOLDOWN_SCANS = 3
 
 IGNORED_INSTRUCTION_DIRS = {
-    ".git", ".hg", ".svn", ".next", ".venv", "build", "coverage", "dist",
-    "node_modules", "target", "vendor",
+    ".git", ".hg", ".svn", ".next", ".venv", ".worktrees", "build",
+    "coverage", "dist", "fixtures", "node_modules", "target", "templates", "vendor",
 }
 INITIATIVE_FIELDS = {
     "title", "owner", "status", "baseline", "linked_plan", "retire_when", "archive_to",

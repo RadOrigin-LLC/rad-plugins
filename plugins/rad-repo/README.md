@@ -14,6 +14,7 @@ It is for one person or a small team that works with coding agents over many ses
 | [rad-repo:verify-release](skills/verify-release/SKILL.md) | Checking whether a pushed revision reached production | A bounded, read-only LIVE, FAILED, RUNNING, or UNVERIFIED result |
 | [rad-repo:doctor](skills/doctor/SKILL.md) | Explaining missing or untrusted repository validation | A read-only report of command sources, path scopes, approval state, and plugin resources |
 | [rad-repo:complexity-audit](skills/complexity-audit/SKILL.md) | Finding code areas that deserve maintenance review | Five to ten ranked hotspots with evidence, risk, and test needs |
+| [rad-repo:recall](skills/recall/SKILL.md) | Recalling a past repository decision or lesson for a task | Up to five source-linked records with scope, status, verification, and stale state |
 | [rad-repo:repo-init](skills/repo-init/SKILL.md) | Adding the minimum document container to a new repository | AGENTS.md, docs/handoff.md, and docs/archive without invented product content |
 | [rad-repo:adopt](skills/adopt/SKILL.md) | Bringing an established repository onto the model | An evidence-led document map, approved moves, verified commands, and a new handoff |
 | [rad-repo:repo-align](skills/repo-align/SKILL.md) | Running a deeper, opt-in document and instruction cleanup | Mechanical findings plus owner-approved routing, archive, or wording changes |
@@ -60,9 +61,14 @@ Its main difference is the authority and trust model. Each fact has an expected 
 
 RAD Repo also keeps code-hotspot review separate from routine work. The complexity audit uses Git churn and file size to choose a few files for human or agent review. It does not add a universal code score or a complexity gate to every session.
 
+Durable recall stays in Git. New decision and lesson lines can carry a stable ID,
+scope, source, verification date, stale date, and supersession link. The recall skill
+uses bounded keyword search over those Markdown files. There is no required memory
+service or generated index.
+
 ## Write and Git boundaries
 
-- Startup, doctor, and complexity-audit are read-only.
+- Startup, recall, doctor, and complexity-audit are read-only.
 - Wrapup updates the handoff. Normal wrapup does not commit. Wrapup and commit creates one local documentation commit.
 - Adopt and repo-align show document moves and judgment-based edits before applying them.
 - Ship authorizes a normal commit and push for the reviewed work. It does not authorize force-push, merge, deployment, deletion, or branch switching.
@@ -90,6 +96,7 @@ Example requests:
 
 - "Run RAD Repo startup and show the next task."
 - "Run RAD Repo doctor. Explain every validation command before asking me to trust it."
+- "Recall what this repo decided about authentication."
 - "Audit code complexity. Keep it read-only and rank only the top five files."
 - "Adopt this existing repository. Show every document move before making it."
 - "Ship the reviewed changes."

@@ -1,5 +1,9 @@
 # UFW + Docker Integration Guide
 
+## Live-change gate
+
+Before changing UFW or Docker firewall rules, confirm the exact instance and server, state the action and expected effect, and require user acceptance. Use a protected environment or manual approval for CI and stop without approval.
+
 ## The Core Problem
 
 Docker manipulates `iptables` directly, inserting rules in the `DOCKER-USER` and `DOCKER` chains that take precedence over UFW's rules. This means:
@@ -21,10 +25,15 @@ The `ufw-docker` utility creates iptables rules in the correct chain so that UFW
 ### Installation
 
 ```bash
-# Download the script
-sudo wget -O /usr/local/bin/ufw-docker \
-  https://github.com/chaifeng/ufw-docker/raw/master/ufw-docker
-sudo chmod +x /usr/local/bin/ufw-docker
+# Download a selected tagged release to a file, then verify its published
+# SHA-256 checksum before installing it. Do not pipe a remote URL to a shell.
+VERSION="<VERIFIED_RELEASE_TAG>"
+EXPECTED_SHA256="<SHA256_FROM_OFFICIAL_RELEASE>"
+curl --fail --location --output "/tmp/ufw-docker-${VERSION}" \
+  "https://github.com/chaifeng/ufw-docker/releases/download/${VERSION}/ufw-docker"
+ACTUAL_SHA256=$(sha256sum "/tmp/ufw-docker-${VERSION}" | cut -d' ' -f1)
+test "$ACTUAL_SHA256" = "$EXPECTED_SHA256"
+sudo install -m 0755 "/tmp/ufw-docker-${VERSION}" /usr/local/bin/ufw-docker
 
 # Install the iptables rules
 sudo ufw-docker install

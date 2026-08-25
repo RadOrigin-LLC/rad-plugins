@@ -1,8 +1,10 @@
 # Coolify REST API v1 Reference
 
-> **Honest framing on API stability.** The API is versioned at `/api/v1` but has no formal stability guarantee — Coolify itself is `v4.0.0-beta.474` (April 2026). The OpenAPI spec and actual API behavior occasionally diverge. Two known active bugs as of April 2026:
-> - **Issue #7702**: `GET /api/v1/projects` is documented to return an `environments` array per project, but the actual response does not include it.
-> - **Issue #8782**: `POST /api/v1/services` rejects the documented `urls` parameter with HTTP 422.
+## Live-change gate
+
+Before an API write or deploy, confirm the exact instance, resource UUID, action, and expected effect, then require user acceptance. In CI, use a protected environment or manual approval and stop when approval is missing.
+
+> **Check the instance at use time.** The API is versioned at `/api/v1`, but the available endpoints and response fields can change. Test the exact request against the target instance before building automation around it.
 >
 > **For production automation, pin to a specific Coolify version and test API calls against your instance** before building tooling on top. The `@radoriginllc/coolify-mcp` server (bundled with this plugin) wraps these endpoints — when the underlying API changes, update the MCP package rather than re-implementing the wrapper.
 
@@ -28,7 +30,7 @@ Current token permissions are:
 
 Use least privilege. Start with `read`, then add only the permission required by the task. `root` bypasses permission checks and is unnecessary for normal deployment work.
 
-**New in beta.474 (April 2026):** Tokens now support optional **expiration dates**. For long-running CI/CD integrations, set an expiration aligned with your secret rotation policy and refresh before it elapses.
+Check the current token fields and permission choices in the exact instance's API token screen before creating automation.
 
 ## Applications
 
@@ -132,7 +134,7 @@ POST /applications/{uuid}/start
 ### List Deployments
 
 ```
-GET /applications/{uuid}/deployments
+GET /deployments/applications/{uuid}
 ```
 
 Response:
@@ -153,7 +155,7 @@ Response:
 ### Get Deployment Logs
 
 ```
-GET /applications/{uuid}/deployments/{deployment_uuid}
+GET /deployments/{deployment_uuid}
 ```
 
 Returns detailed deployment information including full build logs.
@@ -321,13 +323,13 @@ POST /services/{uuid}/stop
 ### Webhook Trigger
 
 ```
-POST /deploy?uuid={app_uuid}&token={webhook_token}
+GET /deploy?uuid={app_uuid}
 
 # Or with query parameters
-GET /deploy?uuid={app_uuid}&token={webhook_token}&force=true
+GET /deploy?uuid={app_uuid}&force=true
 ```
 
-The webhook token is unique per application and found in the application's webhook settings.
+Send the API token in the `Authorization: Bearer <TOKEN>` header. Do not put a token in the URL query string.
 
 ## Common API Patterns
 
@@ -343,8 +345,8 @@ COOLIFY_URL="$3"
 TOKEN="$4"
 
 while true; do
-  STATUS=$(curl -s \
-    "${COOLIFY_URL}/api/v1/applications/${APP_UUID}/deployments/${DEPLOY_UUID}" \
+  STATUS=$(curl -s --fail --show-error \
+    "${COOLIFY_URL}/api/v1/deployments/${DEPLOY_UUID}" \
     -H "Authorization: Bearer ${TOKEN}" | jq -r '.status')
   
   case "$STATUS" in
@@ -362,19 +364,18 @@ done
 - name: Deploy and wait
   run: |
     # Trigger deploy
-    RESPONSE=$(curl -s -X POST \
-      "${{ secrets.COOLIFY_URL }}/api/v1/applications/${{ secrets.APP_UUID }}/deploy" \
-      -H "Authorization: Bearer ${{ secrets.TOKEN }}" \
-      -H "Content-Type: application/json")
+    RESPONSE=$(curl -s --fail --show-error \
+      "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.APP_UUID }}" \
+      -H "Authorization: Bearer ${{ secrets.TOKEN }}")
     
-    DEPLOY_UUID=$(echo "$RESPONSE" | jq -r '.deployment_uuid')
+    DEPLOY_UUID=$(echo "$RESPONSE" | jq -r '.deployments[0].deployment_uuid')
     echo "Deployment started: $DEPLOY_UUID"
     
     # Poll for completion (max 5 minutes)
     for i in $(seq 1 20); do
       sleep 15
-      STATUS=$(curl -s \
-        "${{ secrets.COOLIFY_URL }}/api/v1/applications/${{ secrets.APP_UUID }}/deployments/$DEPLOY_UUID" \
+      STATUS=$(curl -s --fail --show-error \
+        "${{ secrets.COOLIFY_URL }}/api/v1/deployments/$DEPLOY_UUID" \
         -H "Authorization: Bearer ${{ secrets.TOKEN }}" | jq -r '.status')
       
       echo "Attempt $i: $STATUS"

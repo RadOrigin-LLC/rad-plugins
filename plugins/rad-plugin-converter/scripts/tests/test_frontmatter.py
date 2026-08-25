@@ -51,6 +51,43 @@ class FrontmatterTests(unittest.TestCase):
         self.assertIn("Use when", document.values["description"])
         self.assertEqual({"author": "RAD", "version": "1.0"}, document.values["metadata"])
 
+    def test_yaml_metadata_accepts_quoted_dotted_keys_and_comments(self) -> None:
+        skill = self.make_skill(
+            "audit-plugin",
+            'name: audit-plugin\n'
+            'description: "Audit # plugins without changing them."\n'
+            "metadata: # metadata entries follow\n"
+            "  # A YAML comment is allowed here.\n"
+            '  "com.example/version": \'1.0\' # trailing comment\n'
+            '  com.example.name: "RAD"\n'
+            '  "display.name": \'A quoted value\'\n',
+        )
+
+        self.assertEqual([], audit_frontmatter(skill, self.root))
+        document = parse_frontmatter(skill / "SKILL.md")
+        self.assertEqual(
+            {
+                "com.example/version": "1.0",
+                "com.example.name": "RAD",
+                "display.name": "A quoted value",
+            },
+            document.values["metadata"],
+        )
+
+    def test_unsupported_fallback_syntax_is_labeled(self) -> None:
+        skill = self.make_skill(
+            "audit-plugin",
+            "name: audit-plugin\n"
+            "description: Use when auditing plugins.\n"
+            "metadata:\n"
+            "  nested:\n"
+            "    value: unsupported\n",
+        )
+
+        findings = audit_frontmatter(skill, self.root)
+        self.assertIn("skill-frontmatter", {item.code for item in findings})
+        self.assertIn("Unsupported YAML fallback syntax", findings[0].message)
+
     def test_name_mismatch_is_reported_and_can_be_repaired(self) -> None:
         skill = self.make_skill(
             "audit-plugin",

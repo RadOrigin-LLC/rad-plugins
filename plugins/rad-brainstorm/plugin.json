@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "rad-brainstorm",
-  "version": "4.1.1",
-  "description": "An Agent Plugins 1.0.0 package for solo, text-first brainstorming in Codex. It separates idea generation from evaluation, but it cannot guarantee useful ideas or correct conclusions.",
+  "version": "4.1.2",
+  "description": "Text-first brainstorming for one person. It separates idea generation from evaluation and cannot guarantee useful ideas or correct conclusions.",
   "homepage": "https://github.com/radesjardins/codex.skills/tree/main/plugins/rad-brainstorm",
   "repository": "https://github.com/radesjardins/codex.skills",
   "license": "MIT",

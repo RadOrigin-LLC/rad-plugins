@@ -1,6 +1,6 @@
 {
   "name": "rad-plan",
-  "version": "7.1.1",
+  "version": "7.1.2",
   "description": "An Agent Plugins 1.0.0 package for evidence-backed implementation plans in Codex. It writes planning documents, not application code, and its checks cannot prove an architecture will work.",
   "author": {
     "name": "RAD",
@@ -24,7 +24,7 @@
   "interface": {
     "displayName": "RAD Plan",
     "shortDescription": "Build, rescue, update, and review project plans.",
-    "longDescription": "RAD Plan is an Agent Plugins 1.0.0 package with Codex marketplace metadata for solo developers and small teams. It reads bounded repository evidence, asks focused questions, and writes one implementation plan with outcome coverage and recovery steps. It can rescue unclear projects, update plans from Git evidence, and review existing plans. Its linter checks structure and its risk review is model judgment. It does not implement code or prove that an architecture will work.",
+    "longDescription": "Evidence-backed planning for solo developers and small teams. It reads bounded repository evidence, writes one implementation plan, and supports rescue, replan, and review. Its linter checks structure; its risk review is model judgment. It does not implement code or prove an architecture will work.",
     "developerName": "RAD",
     "category": "Productivity",
     "capabilities": [

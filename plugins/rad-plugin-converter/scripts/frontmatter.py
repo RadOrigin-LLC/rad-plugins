@@ -10,6 +10,11 @@ from typing import Any
 
 from models import Finding
 
+try:
+    import yaml as _yaml
+except ImportError:
+    _yaml = None
+
 
 ALLOWED_FIELDS = {
     "name",
@@ -20,7 +25,6 @@ ALLOWED_FIELDS = {
     "allowed-tools",
 }
 SKILL_NAME_RE = re.compile(r"^(?!.*--)[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
-KEY_RE = re.compile(r"^([A-Za-z0-9_-]+):(?:[ \t]*(.*))?$")
 INTEGER_RE = re.compile(r"^[+-]?[0-9]+$")
 FLOAT_RE = re.compile(r"^[+-]?(?:[0-9]+\.[0-9]*|[0-9]*\.[0-9]+)$")
 
@@ -37,8 +41,113 @@ class FrontmatterDocument:
     end_line: int
 
 
+def _strip_inline_comment(value: str) -> str:
+    quote: str | None = None
+    escaped = False
+    for index, character in enumerate(value):
+        if quote == '"' and escaped:
+            escaped = False
+            continue
+        if quote == '"' and character == "\\":
+            escaped = True
+            continue
+        if character in {'"', "'"}:
+            if quote is None:
+                quote = character
+            elif quote == character:
+                if quote == "'" and index + 1 < len(value) and value[index + 1] == "'":
+                    continue
+                quote = None
+            continue
+        if character == "#" and quote is None and (index == 0 or value[index - 1].isspace()):
+            return value[:index].rstrip()
+    return value.rstrip()
+
+
+def _split_mapping_entry(line: str) -> tuple[str, str] | None:
+    quote: str | None = None
+    escaped = False
+    for index, character in enumerate(line):
+        if quote == '"' and escaped:
+            escaped = False
+            continue
+        if quote == '"' and character == "\\":
+            escaped = True
+            continue
+        if character in {'"', "'"}:
+            if quote is None:
+                quote = character
+            elif quote == character:
+                if quote == "'" and index + 1 < len(line) and line[index + 1] == "'":
+                    continue
+                quote = None
+            continue
+        if character == ":" and quote is None:
+            return line[:index].strip(), line[index + 1 :]
+    return None
+
+
+def _split_flow_items(value: str) -> list[str]:
+    items: list[str] = []
+    start = 0
+    quote: str | None = None
+    escaped = False
+    depth = 0
+    for index, character in enumerate(value):
+        if quote == '"' and escaped:
+            escaped = False
+            continue
+        if quote == '"' and character == "\\":
+            escaped = True
+            continue
+        if character in {'"', "'"}:
+            if quote is None:
+                quote = character
+            elif quote == character:
+                if quote == "'" and index + 1 < len(value) and value[index + 1] == "'":
+                    continue
+                quote = None
+            continue
+        if quote is not None:
+            continue
+        if character in "[{(":
+            depth += 1
+        elif character in "]})":
+            depth -= 1
+        elif character == "," and depth == 0:
+            items.append(value[start:index].strip())
+            start = index + 1
+    tail = value[start:].strip()
+    if tail:
+        items.append(tail)
+    return items
+
+
+def _parse_flow(value: str) -> Any:
+    if value.startswith("{") and value.endswith("}"):
+        result: dict[str, Any] = {}
+        inner = value[1:-1].strip()
+        if not inner:
+            return result
+        for item in _split_flow_items(inner):
+            entry = _split_mapping_entry(item)
+            if entry is None:
+                raise FrontmatterError("Unsupported YAML fallback syntax in flow mapping")
+            raw_key, raw_value = entry
+            key = _parse_scalar(raw_key)
+            if not isinstance(key, str):
+                raise FrontmatterError("YAML mapping keys must be strings")
+            if key in result:
+                raise FrontmatterError(f"Duplicate metadata key: {key}")
+            result[key] = _parse_scalar(raw_value)
+        return result
+    if value.startswith("[") and value.endswith("]"):
+        return [_parse_scalar(item) for item in _split_flow_items(value[1:-1])]
+    raise FrontmatterError("Unsupported YAML fallback syntax in flow value")
+
+
 def _parse_scalar(raw: str) -> Any:
-    value = raw.strip()
+    value = _strip_inline_comment(raw.strip())
     if not value:
         return ""
     if len(value) >= 2 and value[0] == value[-1] == '"':
@@ -57,11 +166,11 @@ def _parse_scalar(raw: str) -> Any:
         return int(value)
     if FLOAT_RE.fullmatch(value):
         return float(value)
-    if value.startswith("[") or value.startswith("{"):
+    if (value.startswith("[") and value.endswith("]")) or (value.startswith("{") and value.endswith("}")):
         try:
             return json.loads(value)
         except json.JSONDecodeError:
-            return value
+            return _parse_flow(value)
     return value
 
 
@@ -88,6 +197,7 @@ def _block_value(lines: list[str], start: int, style: str) -> tuple[str, int]:
 def _metadata_value(lines: list[str], start: int) -> tuple[dict[str, Any], int]:
     metadata: dict[str, Any] = {}
     index = start
+    base_indent: int | None = None
     while index < len(lines):
         line = lines[index]
         if line and not line[0].isspace():
@@ -96,17 +206,39 @@ def _metadata_value(lines: list[str], start: int) -> tuple[dict[str, Any], int]:
             index += 1
             continue
         stripped = line.lstrip()
-        if len(line) - len(stripped) < 2:
+        indent = len(line) - len(stripped)
+        if indent < 2:
             raise FrontmatterError("Metadata entries must be indented by at least two spaces")
-        match = KEY_RE.fullmatch(stripped)
-        if not match:
+        if stripped.startswith("#"):
+            index += 1
+            continue
+        if base_indent is None:
+            base_indent = indent
+        if indent != base_indent:
+            raise FrontmatterError("Unsupported YAML fallback syntax: nested metadata is not supported")
+        entry = _split_mapping_entry(stripped)
+        if entry is None:
             raise FrontmatterError(f"Invalid metadata entry on line {index + 2}")
-        key, raw_value = match.group(1), match.group(2) or ""
+        raw_key, raw_value = entry
+        key = _parse_scalar(raw_key)
+        if not isinstance(key, str) or not key:
+            raise FrontmatterError(f"Metadata key on line {index + 2} must be a string")
         if key in metadata:
             raise FrontmatterError(f"Duplicate metadata key: {key}")
         metadata[key] = _parse_scalar(raw_value)
         index += 1
     return metadata, index
+
+
+def _validate_yaml(frontmatter_lines: list[str]) -> None:
+    if _yaml is None:
+        return
+    try:
+        parsed = _yaml.safe_load("\n".join(frontmatter_lines))
+    except Exception as exc:
+        raise FrontmatterError(f"Invalid YAML: {exc}") from exc
+    if not isinstance(parsed, dict):
+        raise FrontmatterError("YAML frontmatter must contain a mapping")
 
 
 def parse_frontmatter(path: Path) -> FrontmatterDocument:
@@ -121,6 +253,7 @@ def parse_frontmatter(path: Path) -> FrontmatterDocument:
         raise FrontmatterError("YAML frontmatter has no closing delimiter") from exc
 
     frontmatter_lines = lines[1:end_index]
+    _validate_yaml(frontmatter_lines)
     values: dict[str, Any] = {}
     key_lines: dict[str, int] = {}
     index = 0
@@ -131,10 +264,14 @@ def parse_frontmatter(path: Path) -> FrontmatterDocument:
             continue
         if line[0].isspace():
             raise FrontmatterError(f"Unexpected indentation on line {index + 2}")
-        match = KEY_RE.fullmatch(line)
-        if not match:
+        entry = _split_mapping_entry(line)
+        if entry is None:
             raise FrontmatterError(f"Invalid frontmatter entry on line {index + 2}")
-        key, raw_value = match.group(1), (match.group(2) or "").strip()
+        raw_key, raw_value = entry
+        key = _parse_scalar(raw_key)
+        if not isinstance(key, str) or not key:
+            raise FrontmatterError(f"Frontmatter key on line {index + 2} must be a string")
+        raw_value = _strip_inline_comment(raw_value).strip()
         if key in values:
             raise FrontmatterError(f"Duplicate frontmatter field: {key}")
         key_lines[key] = index + 2
@@ -278,6 +415,15 @@ def audit_frontmatter(skill_dir: Path, plugin_root: Path) -> list[Finding]:
 
 
 def _atomic_write(path: Path, text: str) -> None:
+    if path.is_symlink():
+        raise FrontmatterError(f"Refusing to replace symbolic link: {path}")
+    parent = path.parent
+    while parent != parent.parent:
+        if parent.is_symlink():
+            raise FrontmatterError(f"Refusing to traverse symbolic link: {parent}")
+        if parent.exists():
+            break
+        parent = parent.parent
     fd, temp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
     try:
         with os.fdopen(fd, "w", encoding="utf-8", newline="") as handle:
@@ -291,19 +437,27 @@ def _atomic_write(path: Path, text: str) -> None:
         raise
 
 
-def repair_skill_name(skill_dir: Path) -> bool:
+def skill_name_repair(skill_dir: Path) -> tuple[bool, str]:
     if not SKILL_NAME_RE.fullmatch(skill_dir.name) or len(skill_dir.name) > 64:
-        return False
+        return False, ""
     skill_path = skill_dir / "SKILL.md"
+    if skill_dir.is_symlink() or skill_path.is_symlink():
+        raise FrontmatterError(f"Refusing to traverse or replace symbolic link: {skill_path}")
     document = parse_frontmatter(skill_path)
     current = document.values.get("name")
     if current == skill_dir.name or "name" not in document.key_lines:
-        return False
+        return False, ""
 
     text = skill_path.read_text(encoding="utf-8-sig")
     lines = text.splitlines(keepends=True)
     index = document.key_lines["name"] - 1
     ending = "\r\n" if lines[index].endswith("\r\n") else "\n" if lines[index].endswith("\n") else ""
     lines[index] = f"name: {skill_dir.name}{ending}"
-    _atomic_write(skill_path, "".join(lines))
-    return True
+    return True, "".join(lines)
+
+
+def repair_skill_name(skill_dir: Path) -> bool:
+    changed, text = skill_name_repair(skill_dir)
+    if changed:
+        _atomic_write(skill_dir / "SKILL.md", text)
+    return changed

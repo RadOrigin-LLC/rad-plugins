@@ -48,7 +48,10 @@
       }
     },
     "new_burden": {"type": "array", "items": {"type": "string"}},
-    "compatibility_verified": {"type": "boolean"},
+    "compatibility_verified": {
+      "type": "boolean",
+      "description": "When true, validate-json.py requires at least one verification_sources entry."
+    },
     "compatibility_notes": {"type": "array", "items": {"type": "string"}},
     "risks": {
       "type": "array",
@@ -63,6 +66,7 @@
     },
     "version_pins": {"type": "object"},
     "verification_sources": {
+      "description": "Sources that support compatibility claims; required when compatibility_verified is true.",
       "type": "array",
       "items": {
         "type": "object",

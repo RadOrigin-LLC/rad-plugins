@@ -12,6 +12,7 @@
     "verdict": { "enum": ["APPROVE", "REVISE", "RETHINK"] },
     "summary": {
       "type": "object",
+      "description": "Severity counts are checked against blocking_issues and advisory_issues by validate-json.py.",
       "required": ["critical_count", "high_count", "medium_count", "low_count"],
       "properties": {
         "anti_pattern_violations": { "type": "integer" },
@@ -33,7 +34,7 @@
         "properties": {
           "task_id": { "type": "string" },
           "category": { "enum": ["anti-pattern", "failure-state", "dag", "tdd", "context", "stack-arch"] },
-          "severity": { "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"] },
+          "severity": { "enum": ["CRITICAL", "HIGH"] },
           "issue": { "type": "string" },
           "anti_pattern_ref": { "type": ["string", "null"] },
           "fix": { "type": "string" }

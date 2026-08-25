@@ -1,0 +1,4 @@
+interface:
+  display_name: "Recall Repo Memory"
+  short_description: "Find relevant decisions and lessons by task"
+  default_prompt: "Use $recall to find the project decisions and lessons relevant to this task."

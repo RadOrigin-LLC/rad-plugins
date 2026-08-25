@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[1]
@@ -12,6 +13,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from audit import PLUGIN_SCHEMA, audit_path
+import convert as convert_module
 from convert import create_plugin
 
 
@@ -80,6 +82,50 @@ class CreatePluginTests(unittest.TestCase):
         self.assertFalse(result.successful)
         self.assertFalse(target.exists())
         self.assertIn("creation-skill-metadata", {item.code for item in result.findings})
+
+    def test_create_dry_run_lists_writes_without_creating_target(self) -> None:
+        target = self.base / "sample-plugin"
+
+        result = create_plugin(
+            target,
+            name="sample-plugin",
+            description="Check sample packages.",
+            author="RAD",
+            skill_name="check-sample",
+            skill_description="Use when checking a sample package.",
+            dry_run=True,
+        )
+
+        self.assertTrue(result.successful)
+        self.assertTrue(result.dry_run)
+        self.assertEqual(
+            ["plugin.json", ".codex-plugin/plugin.json", "skills/check-sample/SKILL.md"],
+            result.changed_files,
+        )
+        self.assertFalse(target.exists())
+
+    def test_create_mid_write_failure_removes_transaction_files(self) -> None:
+        target = self.base / "sample-plugin"
+        original_write = convert_module._atomic_write_text
+
+        def fail_codex_manifest(path: Path, text: str) -> bool:
+            if path == target / ".codex-plugin" / "plugin.json":
+                raise OSError("injected mid-write failure")
+            return original_write(path, text)
+
+        with mock.patch.object(convert_module, "_atomic_write_text", side_effect=fail_codex_manifest):
+            result = create_plugin(
+                target,
+                name="sample-plugin",
+                description="Check sample packages.",
+                author="RAD",
+                skill_name="check-sample",
+                skill_description="Use when checking a sample package.",
+            )
+
+        self.assertFalse(result.successful)
+        self.assertFalse(target.exists())
+        self.assertIn("creation-transaction", {item.code for item in result.findings})
 
 
 if __name__ == "__main__":

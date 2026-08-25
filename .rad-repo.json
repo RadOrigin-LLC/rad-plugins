@@ -1,10 +1,57 @@
 {
   "profile": "core",
   "validation": {
-    "commands": [
-      "python -m unittest discover -s plugins/rad-plugin-converter/scripts/tests -p \"test_*.py\""
-    ],
-    "scopes": {},
+    "commands": [],
+    "scopes": {
+      ".rad-repo.json": [
+        "python plugins\\rad-repo\\scripts\\tests\\test_pre_ship.py",
+        "python plugins\\rad-repo\\scripts\\tests\\test_repo_contract.py",
+        "python plugins\\rad-repo\\scripts\\tests\\test_repo_scan.py",
+        "python plugins\\rad-repo\\scripts\\tests\\test_repo_snapshot.py",
+        "python plugins\\rad-repo\\scripts\\tests\\test_memory_recall.py"
+      ],
+      ".agents/plugins/marketplace.json": [
+        "python plugins/rad-plugin-converter/scripts/rad_plugin_converter.py marketplace . --json"
+      ],
+      "README.md": [
+        "python plugins/rad-plugin-converter/scripts/rad_plugin_converter.py marketplace . --json"
+      ],
+      "docs/plan.md": [
+        "python plugins/rad-plan/scripts/plan-lint.py docs/plan.md --json"
+      ],
+      "marketplace.json": [
+        "python plugins/rad-plugin-converter/scripts/rad_plugin_converter.py marketplace . --json"
+      ],
+      "plugins/rad-brainstorm": [
+        "python plugins/rad-brainstorm/tests/test_plugin_contract.py",
+        "python plugins/rad-brainstorm/tests/test_validate_json.py"
+      ],
+      "plugins/rad-coolify": [
+        "python plugins/rad-coolify/tests/test_lint_dockerfile.py",
+        "python plugins/rad-coolify/tests/test_plugin_contract.py"
+      ],
+      "plugins/rad-para": [
+        "python plugins/rad-para/tests/test_audit_para_structure.py",
+        "python plugins/rad-para/tests/test_move_contract.py"
+      ],
+      "plugins/rad-plan": [
+        "python plugins/rad-plan/tests/test_plan_lint.py",
+        "python plugins/rad-plan/tests/test_validate_json.py"
+      ],
+      "plugins/rad-plugin-converter": [
+        "python -m unittest discover -s plugins/rad-plugin-converter/scripts/tests -p \"test_*.py\""
+      ],
+      "plugins/rad-repo": [
+        "python plugins\\rad-repo\\scripts\\tests\\test_pre_ship.py",
+        "python plugins\\rad-repo\\scripts\\tests\\test_repo_contract.py",
+        "python plugins\\rad-repo\\scripts\\tests\\test_repo_scan.py",
+        "python plugins\\rad-repo\\scripts\\tests\\test_repo_snapshot.py",
+        "python plugins\\rad-repo\\scripts\\tests\\test_memory_recall.py"
+      ],
+      "plugins/rad-writer": [
+        "python -m json.tool plugins/rad-writer/tests/writing-cases.json"
+      ]
+    },
     "allow_empty": false
   }
 }
