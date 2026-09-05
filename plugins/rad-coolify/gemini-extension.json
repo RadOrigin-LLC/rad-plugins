@@ -1,0 +1,14 @@
+{
+  "name": "rad-coolify",
+  "version": "2.1.4",
+  "description": "Guidance and local checks for self-hosted Coolify v4. Optional live actions need client-specific MCP setup and cannot guarantee a successful deployment.",
+  "mcpServers": {
+    "coolify": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@radoriginllc/coolify-mcp@1.1.1"
+      ]
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "name": "rad-repo",
+  "version": "3.3.0",
+  "description": "An Agent Plugins 1.0.0 package for repository context, typed recall, handoffs, scoped checks, and guarded Git shipping in Codex. Its opinionated model and heuristics cannot prove code or production health."
+}

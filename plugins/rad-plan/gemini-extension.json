@@ -1,0 +1,5 @@
+{
+  "name": "rad-plan",
+  "version": "7.1.2",
+  "description": "An Agent Plugins 1.0.0 package for evidence-backed implementation plans in Codex. It writes planning documents, not application code, and its checks cannot prove an architecture will work."
+}

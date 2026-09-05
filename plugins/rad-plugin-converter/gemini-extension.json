@@ -1,0 +1,5 @@
+{
+  "name": "rad-plugin-converter",
+  "version": "1.2.4",
+  "description": "Create, audit, and convert Agent Plugins 1.0.0 packages, then guide reviewed marketplace release. Agent Plugins 1.1.0 is a working draft, and local checks cannot prove support in every client."
+}

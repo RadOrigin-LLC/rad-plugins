@@ -1,0 +1,12 @@
+{
+  "name": "rad-coolify",
+  "version": "2.1.4",
+  "description": "Guidance and local checks for self-hosted Coolify v4. Optional live actions need client-specific MCP setup and cannot guarantee a successful deployment.",
+  "author": {
+    "name": "RAD",
+    "url": "https://github.com/radesjardins"
+  },
+  "license": "MIT",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

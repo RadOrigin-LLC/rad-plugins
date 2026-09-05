@@ -59,13 +59,19 @@ GATED_REFERENCES = (
 
 
 def read_skill(name: str) -> str:
-    return (SKILLS_ROOT / name / "SKILL.md").read_text(encoding="utf-8")
+    entrypoint = SKILLS_ROOT / name / "SKILL.md"
+    text = entrypoint.read_text(encoding="utf-8")
+    operations = entrypoint.parent / "references" / "operations.md"
+    if operations.exists():
+        assert "references/operations.md" in text
+        text += "\n" + operations.read_text(encoding="utf-8")
+    return text
 
 
 def test_all_task_routes_are_present_and_lean() -> None:
     assert {path.name for path in SKILLS_ROOT.iterdir() if path.is_dir()} >= REQUIRED_SKILLS
     for name in REQUIRED_SKILLS:
-        assert len(read_skill(name).splitlines()) < 500
+        assert len((SKILLS_ROOT / name / "SKILL.md").read_text(encoding="utf-8").splitlines()) < 500
 
 
 def test_current_deploy_and_cli_contracts_are_used() -> None:

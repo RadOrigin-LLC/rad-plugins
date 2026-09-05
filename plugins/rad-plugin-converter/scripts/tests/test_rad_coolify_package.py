@@ -38,7 +38,12 @@ class RadCoolifyPackageTests(unittest.TestCase):
         }
         self.assertEqual(10, len(skill_names))
         self.assertIn("coolify-review", skill_names)
-        for obsolete in (".claude-plugin", "agents", "hooks"):
+        native_claude = json.loads((plugin_root / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        self.assertEqual(portable["name"], native_claude["name"])
+        self.assertEqual(portable["version"], native_claude["version"])
+        self.assertEqual("./skills/", native_claude["skills"])
+        self.assertEqual("./.mcp.json", native_claude["mcpServers"])
+        for obsolete in ("agents", "hooks"):
             self.assertFalse((plugin_root / obsolete).exists())
 
         report = audit_path(plugin_root)
