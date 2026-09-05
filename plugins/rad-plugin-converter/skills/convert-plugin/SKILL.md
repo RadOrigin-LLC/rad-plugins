@@ -1,6 +1,6 @@
 ---
 name: convert-plugin
-description: Use when converting a Claude Code, Codex, mixed, legacy, or standalone Agent Skill package to Agent Plugins 1.0.0, including a safe in-place migration or a separate target copy.
+description: Convert or repair a plugin or standalone skill package for Agent Plugins 1.0.0 while preserving client-specific behavior.
 ---
 
 # Convert an Agent Plugin

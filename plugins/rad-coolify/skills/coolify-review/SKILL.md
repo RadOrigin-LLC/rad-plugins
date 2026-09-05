@@ -1,6 +1,6 @@
 ---
 name: coolify-review
-description: Use when reviewing a project for self-hosted Coolify deployment readiness, including Dockerfiles, Compose files, environment handling, CI/CD, health checks, routing, and security. This is a read-only review unless the user later asks for fixes.
+description: Review a project read-only for self-hosted Coolify deployment readiness using local checks and repository evidence.
 ---
 
 # Review a Coolify Deployment

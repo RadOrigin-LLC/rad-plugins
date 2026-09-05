@@ -1,12 +1,6 @@
 ---
 name: coolify-status
-description: >
-  This skill should be used for a quick health/status overview of a Coolify instance — a one-shot
-  "is everything up" dashboard. Trigger when: "coolify status", "is everything up", "how's my
-  Coolify doing", "status check", "give me a Coolify overview", "anything down?", "morning check",
-  "is my server healthy", "what's the state of my deployments". For deep diagnosis of a specific
-  problem, use coolify-troubleshoot; for performing actions (deploy, restart, env vars), use
-  coolify-actions.
+description: Report a one-shot, read-only Coolify instance health and deployment overview.
 ---
 
 # Coolify Status

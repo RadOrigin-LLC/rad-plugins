@@ -1,13 +1,6 @@
 ---
 name: hemingway-bridge
-description: >
-  This skill should be used when the user says "hemingway bridge", "wrap up session",
-  "save my progress", "where did I leave off", "session handoff", "end of session",
-  "capture what I was working on", "pick up where I left off", "PARA handoff",
-  "what should I do next session", or wants to capture session state in a PARA-aware
-  format before stopping work. It can use RAD Repo only after checking that the exact
-  needed `rad-repo:<skill>` appears in the current available-skill list, the current
-  task needs it, and the user accepts.
+description: Capture a PARA notes-session handoff with current status, open questions, materials, and one next action.
 ---
 
 # Hemingway Bridge — PARA-Aware Session Handoffs

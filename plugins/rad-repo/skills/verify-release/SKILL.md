@@ -1,6 +1,6 @@
 ---
 name: verify-release
-description: Use when the user explicitly asks to verify a release, wait for a deployment, check whether a pushed commit is live, prove the production revision, or monitor deployment status to a terminal result.
+description: Verify a release on explicit request by following its exact deployment and proving the pushed revision is live.
 ---
 
 # Verify a Release

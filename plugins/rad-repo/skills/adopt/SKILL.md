@@ -1,16 +1,6 @@
 ---
 name: adopt
-description: >
-  This skill should be used when the user says "adopt this repo", "bring this repo
-  onto the doc model", "this repo predates the system", "onboard this existing
-  project", "migrate this repo's docs", or when startup found an established repo
-  without the doc model. Brownfield archaeology, read-only toward code: reads git
-  history plus a bounded docs/code inventory, drafts AGENTS.md/handoff/decisions from evidence
-  (verifying build/test commands by actually running them), triages every existing
-  doc onto the shelf (keep / merge / satellite / archive — proposing each move, never
-  silently deleting), asks only what evidence can't answer, stamps dormant repos, runs
-  fit-out, and hands plan reconstruction to the planner rescue skill. Never changes
-  code.
+description: Bring an existing repository onto the RAD Repo document model, preserving code and approving document migrations.
 allowed-tools: Read Glob Grep Bash Write Edit AskUserQuestion
 ---
 
@@ -124,7 +114,7 @@ anything without that lifecycle metadata remains a routing candidate.
 
 ## 5. Ask only what evidence can't answer
 
-5–10 questions, one AskUserQuestion round where possible. Always include:
+Ask only unresolved questions that affect adoption, in one batch when possible. Use the host's question tool or plain text. Cover these when evidence has not settled them:
 
 - **Active or dormant?** Dormant → stamp `Status: dormant — maintenance only` in
   AGENTS.md's identity line and skip fit-out extras that only matter for active work.

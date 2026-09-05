@@ -1,11 +1,6 @@
 ---
 name: twelve-favorite-problems
-description: >
-  This skill should be used when the user says "12 favorite problems", "twelve favorite problems",
-  "Feynman problems", "capture filter", "what should I save", "I save too much", "I don't know
-  what to capture", "my captures are unfocused", "favorite problems workshop", "identify my problems",
-  "what are my big questions", or wants to create, review, or use a list of guiding questions
-  as a personal capture filter for their Second Brain.
+description: Create or revise guiding questions that filter what to capture in a personal Second Brain.
 ---
 
 # 12 Favorite Problems Workshop

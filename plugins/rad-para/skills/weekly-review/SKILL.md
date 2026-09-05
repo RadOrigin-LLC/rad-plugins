@@ -1,9 +1,6 @@
 ---
 name: weekly-review
-description: >
-  Use only when the user asks to run a weekly PARA review or wants a briefing on stale
-  projects, inbox load, recent second-brain activity, deadlines, and next review actions.
-  Scans an existing authorized PARA structure read-only; it does not reorganize files.
+description: Run a requested, read-only PARA weekly review of projects, inbox items, recent activity, and deadlines.
 ---
 
 Run a read-only PARA weekly review. Autonomously scan the user's authorized PARA folder

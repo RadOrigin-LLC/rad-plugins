@@ -1,13 +1,6 @@
-# Discovery Interview — the grilling protocol
+# Discovery interview
 
-The planner's job in Discovery is to **understand the project better than the user can
-articulate it cold**. Vibe coders can answer questions about their product all day —
-what they can't do is volunteer the right information unprompted. So the planner drives
-a structured interview: it asks, mirrors back, follows up, and doesn't move on until
-every coverage area is *settled* or *explicitly unknown*.
-
-This is rigor, not bureaucracy: capped rounds, no jargon, and nothing asked that the
-repo already answers.
+Use repository evidence and the user's request to establish scope and acceptance. Ask about material gaps; keep unresolved choices visible.
 
 ## The eight coverage areas
 
@@ -23,65 +16,20 @@ skipped).
 | 4 | **Success criteria** | Observable signs it's working — not feelings ("it feels fast") but checkable facts ("a link shortens in under a second"). |
 | 5 | **Hard constraints** | Money, time, skills, platform/devices, accounts and services already paid for or ruled out. |
 | 6 | **Existing assets** | Repo, designs, data, domain names, prior attempts — anything that exists already. |
-| 7 | **Deliberate exclusions** | At least two things this project is explicitly NOT building. If the user can't name any, propose candidates from the conversation and ask. |
+| 7 | **Deliberate exclusions** | Scope exclusions that matter to this project. Ask when an unresolved boundary would change the plan; do not invent exclusions to meet a count. |
 | 8 | **Danger zones** | Does this touch auth, payments, personal data, or external integrations? These change planning rigor (extra checkpoints, stop conditions, security tasks). |
 
 ## Protocol
 
-**Pre-fill from evidence first.** On an existing codebase, the repo answers many areas
-before the user is asked anything (read order: `docs/prd.md`, `docs/handoff.md`,
-existing `docs/plan.md`, dated spec docs matching `docs/*-spec.md` and
-`docs/*-design.md` (newest first), `AGENTS.md`, `README.md`, the manifest,
-directory structure — in one parallel batch). Never ask a question the repo already
-answers; instead *confirm*: "The PRD says X — still true?" **The same rule covers
-dated specs** — a brainstorm or design-sprint output is settled input, so confirm,
-don't re-ask: "The spec says X — still true?" Specs describe *what* and *why*;
-sequencing is plan.md's alone — never import a spec's ordering as plan structure.
+Use the coverage table to find gaps, not to force an interview. Fill answers from the request, approved product documents, and relevant repository evidence. Treat settled decisions as inputs unless current evidence contradicts them.
 
-**Round 1 — open the areas (4–6 questions).** Target the least-known areas. Use a
-structured user-input tool for choice-shaped questions when the runtime provides one;
-otherwise ask concise plain-text questions. Use free text for open ones. Rules for
-every question:
+Use the depth chosen under the `plan` skill. For quick planning, ask at most one batch of five unresolved questions. For full planning, use up to three rounds, stopping as soon as scope and acceptance are clear. Use the host's question tool when helpful, or concise plain text.
 
-- Plain language, no jargon. "Where should this run — phone, browser, your own
-  computer?" beats "What's your deployment target?"
-- One topic per question.
-- When the purpose isn't obvious, say why you're asking ("I ask because payments
-  change how carefully we have to sequence this").
-
-**The mirror.** After each round, restate the project back in 3–5 plain sentences —
-"Here's what I believe you're building, for whom, and what done looks like" — and ask
-what's wrong with it. The mirror is the highest-value move in the interview: users
-correct a wrong summary far more reliably than they answer an abstract question.
-
-**Rounds 2–3 — follow up only on unsettled areas.** Push on vagueness: if the user
-says "people can share stuff," ask "share what, with whom, and what does the other
-person see?" **Cap at 3 rounds.** Anything still open after round 3 is recorded as
-*explicitly unknown* — it becomes a Key assumption (best guess, marked as guess) or a
-Risk, and planning proceeds.
-
-**Propose assumptions — never ask the user to invent them.** From the answers, draft
-3–6 candidate assumptions ("No real users yet, so we can change anything freely" /
-"You're the only developer" / "Data loss during development is acceptable") and ask
-the user to confirm, deny, or edit each. Confirmed ones land in `plan.md`'s **Key
-assumptions**.
+Ask only about choices that affect the plan. Summarize a complex or disputed scope for correction; do not require repeated mirror-back or confirmation of already approved facts. Record unresolved points as assumptions or risks. Never assume permission for data loss, production access, or expanded scope.
 
 ## Closing the interview
 
-Two gates, in order, before any planning begins:
-
-**1. The speed fork (user's choice).** Give a recommendation, then ask directly:
-
-> **Quick plan:** one evidence pass, one batch of no more than five questions,
-> one mirror, one assumption confirmation, no stack review unless a new choice
-> exists, and one risk pass. Write only the plan by default.
-> **Full plan:** up to three discovery rounds, optional stack review when a real
-> choice exists, and one first risk pass that repeats only after REVISE.
-
-Recommend quick for a known change in one system with no new service, deployment,
-auth, payment, personal-data, or schema risk. Recommend full for a new product,
-unclear architecture, cross-system work, migration, auth, payment, personal data,
-or a new deployment target. The user decides.
+Proceed with the settled scope. The plan remains DRAFT until owner approval.
 
 **2. The PRD gap check.** Run this on the full path, or on the quick path only when
 the owner asks. If `docs/prd.md` is missing, a skeleton, or contradicts

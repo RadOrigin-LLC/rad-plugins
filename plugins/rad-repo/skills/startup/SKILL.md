@@ -1,16 +1,6 @@
 ---
 name: startup
-description: >
-  This skill should be used when the user says "startup", "start session",
-  "orient me", "where did we leave off", "catch me up", "what's the state",
-  "session briefing", or "what was I working on". Fast, read-only session
-  orientation: use the core profile to read L0/L1 plus direction and git state, run the two cheap mechanical
-  scans, and surface a trust report (one line per managed doc, measured in
-  commits-behind) plus the next task from the handoff. Recommends
-  repo-init on a fresh repo, adopt on an
-  established un-managed repo, and repo-align when the trust
-  report goes red. It does not scaffold, audit deeply, clean, write, or change
-  anything.
+description: Give a read-only repository session briefing from Git state, document freshness, and the current handoff.
 allowed-tools: Read Glob Grep Bash
 ---
 

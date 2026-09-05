@@ -1,6 +1,6 @@
 ---
 name: complexity-audit
-description: Use when the user says "audit code complexity", "find hard-to-maintain code", "where should this repo be simplified", "find technical debt hotspots", "run a code health review", or asks which complex code deserves attention. Runs a read-only Git hotspot scan, reviews the highest-value code areas, and ranks 5 to 10 findings with evidence, risk, and test needs. It does not change code or run during startup, wrapup, or ship.
+description: Review code maintenance hotspots read-only when the user requests a complexity or technical-debt audit.
 ---
 
 # Complexity Audit
@@ -38,7 +38,7 @@ Do not install a tool unless the user asks. Do not create a custom language pars
 
 ## 4. Report
 
-For each of 5 to 10 findings, give:
+For each supported finding, up to ten, give:
 
 1. File and symbol, when known.
 2. Churn, size, and quality evidence.
@@ -48,7 +48,7 @@ For each of 5 to 10 findings, give:
 6. Tests needed before a change.
 7. Confidence: high, medium, or low.
 
-End with the top three review targets. Keep raw scan output out of repository docs unless the user asks to save it.
+Prioritize the strongest review targets. Do not invent findings to fill a quota. Keep raw scan output out of repository docs unless the user asks to save it.
 
 ## Boundaries
 

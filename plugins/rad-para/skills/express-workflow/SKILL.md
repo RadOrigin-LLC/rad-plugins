@@ -1,12 +1,6 @@
 ---
 name: express-workflow
-description: >
-  This skill should be used when the user says "help me write this", "assemble my notes",
-  "I have notes and need to create something", "intermediate packets", "archipelago of ideas",
-  "I'm facing a blank page", "dial down the scope", "I'm overwhelmed by this project",
-  "ship something smaller", "connect these ideas", "draft from my notes", "turn my research
-  into output", or wants to assemble captured knowledge into creative output like articles,
-  presentations, reports, or deliverables.
+description: Turn existing notes, research, and reusable drafts into a requested article, presentation, report, or other deliverable.
 ---
 
 # Express Workflow — From Notes to Output

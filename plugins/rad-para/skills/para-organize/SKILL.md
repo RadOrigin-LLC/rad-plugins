@@ -1,11 +1,6 @@
 ---
 name: para-organize
-description: >
-  This skill should be used when the user says "organize my notes", "PARA method", "second brain",
-  "set up PARA", "I'm overwhelmed with files", "productivity system", "knowledge management",
-  "where does this go", "classify this note", "my system is broken", "digital organization",
-  "clean slate", "project list", or wants to build, fix, or maintain a PARA-based knowledge
-  management system. Covers PARA setup, classification, system diagnosis, and review workflows.
+description: Set up, classify, or reorganize a PARA knowledge system, with an approved plan before filesystem changes.
 ---
 
 # PARA Organization & System Management
@@ -38,7 +33,7 @@ For specialized workflows, defer to these dedicated skills when appropriate:
 ## Workflow Rules
 
 ### Conversation Flow
-- Ask **one question per turn**. Wait for the answer before proceeding.
+- Use the request and known context first. Batch only unresolved questions that affect classification or the approved write plan; wait when an answer is required.
 - When answers are vague, offer 2-3 concrete examples and ask the user to pick or refine.
 - Frame questions so the user understands why the answer matters.
 - Be direct and efficient -- no filler, no flattery.
@@ -56,27 +51,16 @@ For specialized workflows, defer to these dedicated skills when appropriate:
 
 ## Entry Point -- Detect Session Type
 
-Determine what the user needs:
+Route from the user's request:
 
-> "What brings you here today?
-> 1. **I'm new to PARA** -- set up a Second Brain from scratch
-> 2. **My system is broken** -- diagnose and fix it
-> 3. **Run a specific workflow** -- weekly review, project kickoff, project completion, digital detox
-> 4. **Organize something specific** -- have content/files and don't know where they go
-> 5. **Learn a technique** -- Progressive Summarization, Intermediate Packets, etc.
-> 6. **AI-enhance my system** -- use Codex to supercharge my Second Brain"
+- New system: Quick Start Setup.
+- Broken system: System Diagnosis.
+- A named review, kickoff, or completion: its section in `references/workflows.md`.
+- One item to classify: Classification Flow.
+- A named technique: its dedicated skill or reference, if available.
+- AI-assisted capture or processing: the relevant section in `references/code_framework.md`.
 
-Route based on answer:
-- **Option 1:** Quick Start Setup (below)
-- **Option 2:** System Diagnosis (below)
-- **Option 3:** Read the specific workflow from `references/workflows.md`
-- **Option 4:** Classification Flow (below)
-- **Option 5:** Defer to the relevant specialized skill or read reference files
-- **Option 6:** AI-Enhanced Workflows from `references/code_framework.md`
-
-**If the user is pointing Codex at a real folder of files to reorganize** (not just advising
-on an app), use the **Filesystem Reorganization** track below instead of the conversational
-Quick Start -- it touches real files and requires the plan-first safety contract.
+Ask only if the route is unclear. For actual filesystem changes, use Filesystem Reorganization and its plan-first approval contract.
 
 ## Quick Start Setup (New Users)
 

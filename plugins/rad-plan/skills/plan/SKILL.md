@@ -1,12 +1,6 @@
 ---
 name: plan
-description: >
-  Use when the user wants a structured, risk-first implementation plan before
-  coding: plan a project or feature, architect a decided build, break work into
-  executable tasks, or map the work. Runs an evidence-backed interview, checks
-  the relevant code surface, builds a Now/Next/Later release map, writes one
-  maintained plan, validates it, and routes confirmed follow-ups without writing
-  application code. Do not use it to rescue a project whose current state is unclear.
+description: Create an evidence-backed implementation plan for a clear project or feature before coding.
 ---
 
 # Plan
@@ -17,7 +11,7 @@ Do not write application code or source files. Planning artifacts are the only a
 
 ## Resolve paths
 
-Resolve the plugin root as the directory two levels above this `SKILL.md`. Convert each referenced plugin path to an absolute path before reading or running it.
+Resolve the plugin root as two directories above this skill directory. Convert each referenced plugin path to an absolute path before reading or running it.
 
 Read `references/plan-template.md` as the authority for the plan contract. A repository `AGENTS.md` document model overrides its default names and headings.
 
@@ -29,6 +23,10 @@ Read `references/plan-template.md` as the authority for the plan contract. A rep
 - Put other confirmed document changes in the plan's optional `## Durable follow-ups` section.
 - Do not create decisions, ideas, architecture, API, status, roadmap, timeline, or update-prompt files.
 - Propose an `AGENTS.md` stack block in chat when useful. Write it only after separate owner approval.
+
+## Harness support
+
+Use the host's available subagent tool for independent reviewers; role names such as `risk_assessor` describe the assignment, not a required model or tool name. If independent review is unavailable, complete the mechanical checks and draft, report the missing review, and leave approval pending. Do not label self-review as independent review.
 
 ## Companion-skill rule
 
@@ -58,37 +56,17 @@ If a bare repository has no `AGENTS.md` and no `docs/`, explain that a small rep
 
 ### Read evidence before questions
 
-For an existing repository, read in one batch when present:
-
-- `docs/prd.md`, `docs/handoff.md`, the current plan, and `AGENTS.md`;
-- `README.md`, the manifest, and top-level configuration;
-- dated `docs/*-spec.md` and `docs/*-design.md`, newest first;
-- the top-level directory shape.
-
-Treat the PRD as product authority. Confirm facts from the repository instead of asking the owner to repeat them. Surface contradictions as questions.
+For an existing repository, start with applicable instructions, the current plan or handoff, and the approved product scope. Read the README, configuration, or relevant specs only to resolve a planning question. Treat the PRD as product authority; ask about contradictions and unresolved choices.
 
 ### Choose depth
 
-Ask once whether the owner wants quick or full planning. Recommend:
-
-- **Quick:** one known change in one system with no new service, deployment target, auth, payment, personal-data, or schema risk.
-- **Full:** a new product, unclear architecture, cross-system work, migration, auth, payment, personal data, or new deployment target.
-
-The owner decides.
+Use the user's requested depth. Otherwise use quick for one known change without a new service, deployment target, auth, payment, personal-data, or schema risk; use full for new products, cross-system work, or those risks. State the choice and proceed. Ask only when the depth would materially change the requested outcome.
 
 ### Run discovery
 
-Full planning uses the eight coverage areas, mirror-back step, and no more than three question rounds from `discovery-interview.md`.
+Full planning uses the coverage areas in `discovery-interview.md` to find gaps, with at most three question rounds and no repeated confirmation of settled scope.
 
-Quick planning uses:
-
-- one evidence pass;
-- one batch of no more than five unresolved questions;
-- one mirror-back;
-- one assumption confirmation;
-- no PRD draft unless the owner asks.
-
-Anything still open becomes an explicit assumption or risk.
+Quick planning uses the available evidence and asks only unresolved questions that affect scope, correctness, or acceptance. Combine needed questions into one batch of at most five. Summarize the settled scope; do not require a separate interview or assumption-confirmation round when the user already supplied it. Keep remaining unknowns visible as assumptions or risks. Draft a PRD only when requested.
 
 For full planning, offer the PRD gap check from `discovery-interview.md`. Confirm each proposed section before writing.
 
@@ -98,7 +76,7 @@ After scope is settled and before task paths are written, inspect the likely imp
 
 1. Find the entry point, affected module, nearest tests, and relevant configuration.
 2. Read only those files and their direct callers or imports when needed.
-3. Use a budget of 12 files for quick and 30 files for full.
+3. Expand the inspection only when a named uncertainty affects the plan.
 4. Mark every planned path as `[existing]` or `[new]`.
 5. When a path remains uncertain, make bounded discovery part of the task instead of inventing a path.
 
@@ -123,13 +101,7 @@ Record only the final choice and short reason in the plan. Put any confirmed dur
 
 ## 3. Build the plan
 
-Read these references in one batch:
-
-- `references/plan-template.md`;
-- `references/failure-state-template.md`;
-- `references/tdd-constraints.md`;
-- `references/context-management.md`;
-- `references/anti-patterns.md`.
+Use `references/plan-template.md` for required fields. Consult `failure-state-template.md` for recovery, `tdd-constraints.md` for task validation, `context-management.md` for work that spans sessions, and `anti-patterns.md` when reviewing a specific planning weakness. Read only relevant sections; do not reload a reference already in context.
 
 Build in this order:
 
@@ -166,7 +138,7 @@ Dispatch one bounded, read-only `risk_assessor` subagent with the detected plan 
 
 ## 5. Review with the owner
 
-Present in this order:
+Present the result at the depth the owner needs. For a full plan, include:
 
 1. Four to six plain sentences about the product, Now release, next horizon, and largest risk.
 2. The release map.

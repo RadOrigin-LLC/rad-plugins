@@ -1,15 +1,6 @@
 ---
 name: repo-align
-description: >
-  This skill should be used when the user says "repo-align", "align the repo",
-  "clean up the repo", "check for drift", "is the repo in good shape", "find
-  contradictions", "what's gotten messy", "doc cleanup", "are my docs consistent",
-  "tidy up the docs", or when startup's trust report went red. The deep, opt-in
-  alignment pass: mechanical scans (drift, freshness, vocabulary, size budgets)
-  plus judgment passes — a doc router that reads off-shelf files and proposes
-  where their content belongs, an api.md route-diff, and an on-request rules
-  audit of AGENTS.md. Proposes before acting on every judgment call; preserves
-  history with git mv; never silently merges, deletes, or archives.
+description: Review RAD Repo documentation drift and propose approved corrections to structure, references, or conflicting guidance.
 allowed-tools: Read Glob Grep Bash Write Edit AskUserQuestion
 ---
 

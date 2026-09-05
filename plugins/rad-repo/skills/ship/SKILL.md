@@ -1,12 +1,6 @@
 ---
 name: ship
-description: >
-  This skill should be used when the user says "ship", "ship it", "close out and
-  push", "wrap and ship", "send it", "commit and push everything", or "end the
-  session and push". It refreshes the handoff, stages reviewed paths, checks the
-  local repository contract, runs approved validation, commits, pushes, and reports
-  the exact state. Ship stops after push. Invoking ship authorizes commit and push.
-  It does not authorize a force-push, merge, deploy action, or deletion.
+description: Commit and push reviewed repository work when requested, using the RAD Repo handoff and validation gates. Stops after push.
 allowed-tools: Read Glob Grep Bash Write Edit AskUserQuestion
 ---
 

@@ -1,11 +1,6 @@
 ---
 name: rescue
-description: >
-  Use when an existing project has unclear status, missing or stale documents,
-  abandoned work, or uncertain intent: rescue this project, get it back on track,
-  untangle it, or determine where it stands. Performs read-only project archaeology,
-  asks evidence-led keep/cut/unknown questions, can draft a missing PRD from approved
-  answers, and creates a checked release-map plan. It never fixes or runs application code.
+description: Recover an unclear or stalled project from repository evidence and produce a plan without running or changing application code.
 ---
 
 # Rescue
@@ -16,7 +11,7 @@ Do not modify, run, build, test, delete, or clean up application code. Needed re
 
 ## Resolve paths and write boundary
 
-Resolve the plugin root as the directory two levels above this `SKILL.md`. Read `references/discovery-interview.md` and `references/plan-template.md`.
+Resolve the plugin root as two directories above this skill directory. Read `references/discovery-interview.md` and `references/plan-template.md`.
 
 Allowed writes:
 
@@ -25,6 +20,10 @@ Allowed writes:
 - append-only entries in existing decisions or ideas files after owner approval.
 
 Put other confirmed document changes in `## Durable follow-ups`. Do not create architecture, API, decisions, ideas, status, roadmap, or update-prompt files.
+
+## Harness support
+
+Use the host's available subagent tool for independent reviewers; role names such as `risk_assessor` describe the assignment, not a required model or tool name. If independent review is unavailable, complete the mechanical checks and draft, report the missing review, and leave approval pending. Do not label self-review as independent review.
 
 ## Companion-skill rule
 
@@ -66,13 +65,13 @@ For each major existing part, ask the owner to choose:
 - cut;
 - unknown.
 
-Use quick or full depth under the `plan` skill rules. Quick uses one batch of no more than five unresolved questions. Full uses up to three rounds. Mirror the project back and propose assumptions for confirmation.
+Use quick or full depth under the `plan` skill rules. Quick uses one batch of no more than five unresolved questions. Full uses up to three rounds. Summarize disputed or complex scope for correction; do not re-confirm settled answers. Record remaining unknowns as assumptions or risks.
 
 For full rescue, offer to draft a missing or skeletal PRD from confirmed answers. For quick rescue, draft it only when the owner asks.
 
 ## 3. Check the implementation surface
 
-After scope is settled, inspect the entry point, affected modules, nearest tests, and relevant config. Use a budget of 12 files for quick and 30 for full. Mark plan paths `[existing]` or `[new]`. Keep uncertain paths inside a bounded discovery task.
+After scope is settled, inspect the entry point, affected modules, nearest tests, and relevant config. Expand only to resolve a named planning uncertainty. Mark plan paths `[existing]` or `[new]`. Keep uncertain paths inside a bounded discovery task.
 
 ## 4. Plan from current reality
 

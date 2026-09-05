@@ -1,15 +1,6 @@
 ---
 name: repo-init
-description: >
-  This skill should be used when the user says "set up this repo", "bootstrap this
-  project", "new project setup", "scaffold the docs", "initialize the repo model",
-  "get me started right", or when startup recommended it on a fresh repo. Builds the
-  container for the doc model in a new or nearly empty repo: an AGENTS.md skeleton
-  with the stamped doc-model block, docs/ +
-  docs/archive/, and a handoff stub. Creates no shelf docs (their triggers haven't
-  fired), runs no fit-out, never invents product content, and ends by recommending
-  the planning workflow. For an existing repo with history and docs, use
-  `adopt` instead.
+description: Initialize the RAD Repo document model in a new or nearly empty repository. Use adopt for an established repository.
 allowed-tools: Read Glob Grep Bash Write AskUserQuestion
 ---
 
@@ -40,8 +31,7 @@ If the repo is established, stop and recommend `adopt`.
 
 ## 2. Agent scope and profile
 
-Codex reads `AGENTS.md` natively. RAD Repo creates only that agent instruction file.
-Another agent's files are outside this Codex plugin and require a separate request.
+RAD Repo creates `AGENTS.md` as the repository contract. Codex and OpenCode load it natively. In other harnesses, read it explicitly when it is not loaded. Create or edit client-specific import files only when requested.
 
 The default RAD Repo profile is `core`. Do not create `.rad-repo.json` only to
 record that default. If the owner wants the full profile to persist, add

@@ -1,6 +1,6 @@
 ---
 name: create-plugin
-description: Create a new portable Agent Plugins 1.0.0 package with Codex compatibility metadata and an optional starter Agent Skill. Use when the user asks to create, scaffold, or start a new plugin package.
+description: Create a new Agent Plugins 1.0.0 package with Codex metadata and an optional starter skill.
 ---
 
 # Create an Agent Plugin

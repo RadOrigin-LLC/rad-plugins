@@ -1,6 +1,6 @@
 ---
 name: audit-plugin
-description: Use when checking whether a Claude Code, Codex, mixed, standalone Agent Skill, or Agent Plugins package meets Agent Plugins 1.0.0 and needs a read-only conformance report.
+description: Audit plugin or standalone skill conformance to Agent Plugins 1.0.0 without modifying the package.
 ---
 
 # Audit an Agent Plugin

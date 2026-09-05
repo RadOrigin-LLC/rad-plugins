@@ -1,6 +1,6 @@
 ---
 name: publish-plugin
-description: Use when a reviewed plugin must be added to or updated in a marketplace, published to Git, refreshed in a client, installed, or proven available to an agent.
+description: Register, release, install, or verify a reviewed plugin within the requested marketplace and client scope.
 ---
 
 # Publish a Plugin

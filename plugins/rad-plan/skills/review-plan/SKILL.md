@@ -1,10 +1,6 @@
 ---
 name: review-plan
-description: >
-  Use when the user asks to review, audit, validate, or check an existing
-  implementation plan for completeness, dependencies, risks, rollback safety,
-  outcome coverage, task size, or execution readiness. Runs mechanical lint and
-  one read-only risk review. It changes the plan only after explicit approval.
+description: Review an existing implementation plan for execution readiness with mechanical lint and independent risk review.
 ---
 
 # Review Plan
@@ -18,7 +14,7 @@ Do not write durable documents. Edit the plan only after the owner accepts speci
 
 ## Resolve paths
 
-Resolve the plugin root as the directory two levels above this `SKILL.md`.
+Resolve the plugin root as two directories above this skill directory.
 
 Detect the plan in this order unless the user supplied a path:
 
@@ -28,6 +24,10 @@ Detect the plan in this order unless the user supplied a path:
 4. `PLAN.md`
 
 Read the plan completely. If none exists, explain that a plan is needed and suggest the `plan` skill.
+
+## Harness support
+
+Use the host's available subagent tool for independent reviewers; role names such as `risk_assessor` describe the assignment, not a required model or tool name. If independent review is unavailable, complete the mechanical checks and draft, report the missing review, and leave approval pending. Do not label self-review as independent review.
 
 ## 1. Mechanical review
 
@@ -43,7 +43,7 @@ Do not send deterministic findings to a model for debate.
 
 ## 2. Judgment review
 
-Read `references/anti-patterns.md`, `references/failure-state-template.md`, `references/tdd-constraints.md`, and `references/context-management.md`.
+Consult `references/anti-patterns.md` for planning weaknesses, `references/failure-state-template.md` for recovery, `references/tdd-constraints.md` for validation, and `references/context-management.md` for work spanning sessions. Load only sections relevant to this plan.
 
 Read relevant approved product or architecture documents when present. Pass them as read-only supporting context.
 

@@ -1,6 +1,6 @@
 ---
 name: doctor
-description: Use when the user says "RAD Repo doctor", "check the repo contract", "why is validation missing", "show validation commands", "trust these repo commands", or when ship reports validation_missing, validation_untrusted, missing plugin resources, or an old document-model stamp. Explains the exact path scopes, command sources, local trust state, profile, and packaged resources. It does not run repository validation commands.
+description: Diagnose RAD Repo validation declarations, command trust, path scopes, or missing resources without running project validation.
 ---
 
 # RAD Repo Doctor

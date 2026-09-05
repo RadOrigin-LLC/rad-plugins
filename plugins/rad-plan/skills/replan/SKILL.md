@@ -1,11 +1,6 @@
 ---
 name: replan
-description: >
-  Use when the user says update, revise, restructure, or re-baseline an existing
-  implementation plan, or when shipped work, scope changes, parked ideas, or new
-  evidence made the current plan inaccurate. Reconciles the plan with Git and
-  repository evidence, previews Added/Modified/Removed changes, preserves shipped
-  history, updates outcome coverage, and runs plan checks. It does not implement code.
+description: Revise an existing implementation plan when scope, shipped work, or new evidence changes the remaining work.
 ---
 
 # Replan
@@ -16,7 +11,11 @@ Do not write application code or run project tests. Write the detected plan path
 
 ## Resolve paths and contract
 
-Resolve the plugin root as the directory two levels above this `SKILL.md`. Read `references/plan-template.md` as the plan authority. A repository `AGENTS.md` document model overrides its defaults.
+Resolve the plugin root as two directories above this skill directory. Read `references/plan-template.md` as the plan authority. A repository `AGENTS.md` document model overrides its defaults.
+
+## Harness support
+
+Use the host's available subagent tool for independent reviewers; role names such as `risk_assessor` describe the assignment, not a required model or tool name. If independent review is unavailable, complete the mechanical checks and draft, report the missing review, and leave approval pending. Do not label self-review as independent review.
 
 ## Companion-skill rule
 

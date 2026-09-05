@@ -1,13 +1,6 @@
 ---
 name: wrapup
-description: >
-  This skill should be used when the user says "wrapup", "wrap up", "end of
-  session", "save state", "handoff", "leave a clean stopping point", "I'm done for
-  now", or "before I close". It refreshes docs/handoff.md from Git evidence, keeps
-  useful recovery detail, carries the Deferred ledger forward, and ends with an
-  exact closure report. "Wrapup and commit" commits only approved handoff documents.
-  "Wrapup and ship" uses the ship workflow. The full form adds a session-scoped
-  document reconcile. It does not run tests or push.
+description: Save a repository session handoff from Git and recorded validation evidence. Does not run tests or push.
 allowed-tools: Read Glob Grep Bash Write Edit AskUserQuestion
 ---
 

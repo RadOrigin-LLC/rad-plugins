@@ -1,9 +1,6 @@
 ---
 name: audit
-description: >
-  Use only when the user asks to audit, validate, diagnose, or health-check an existing
-  PARA folder structure or second brain. Performs read-only structural analysis and reports
-  anti-patterns, false projects, nesting, staleness, and orphaned files; it does not reorganize files.
+description: Audit an authorized PARA folder structure read-only when the user requests a structural health check.
 ---
 
 Run a read-only PARA audit. Autonomously scan the user's authorized PARA folder

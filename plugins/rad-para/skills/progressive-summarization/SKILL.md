@@ -1,11 +1,6 @@
 ---
 name: progressive-summarization
-description: >
-  This skill should be used when the user says "summarize this note", "progressive summarization",
-  "distill this", "bold the key points", "highlight the important parts", "executive summary",
-  "layer 2", "layer 3", "layer 4", "make this scannable", "TL;DR this article", "distill my notes",
-  or pastes a raw note, article, transcript, or long text and wants it condensed into layered,
-  scannable summaries. Applies Tiago Forte's Progressive Summarization technique.
+description: Distill notes using Progressive Summarization layers while preserving source text and attribution.
 ---
 
 # Progressive Summarization
@@ -75,12 +70,7 @@ Ask for the input if not provided:
 
 ### Step 2: Ask for Context
 
-Before distilling, ask one question:
-> "What project or goal is this related to? Knowing this helps me prioritize the most
-> relevant points. (If it's general reference, just say so.)"
-
-This context shapes which points get bolded and highlighted -- the same article distills
-differently for different purposes.
+Use the project or purpose already supplied. Ask only when choosing the important passages depends on missing context; otherwise treat the note as general reference.
 
 ### Step 3: Apply Layers
 
@@ -89,7 +79,7 @@ the user requests specific layers.
 
 ### Step 4: Format Output
 
-Ask the user's preferred output format if not already known:
+Use the requested format or the note's existing format. Default to Markdown when neither is known:
 
 | Format | Output Style |
 |--------|-------------|

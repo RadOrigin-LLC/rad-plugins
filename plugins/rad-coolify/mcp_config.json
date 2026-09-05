@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "coolify": {
+      "command": "npx",
+      "args": ["-y", "@radoriginllc/coolify-mcp@1.1.1"]
+    }
+  }
+}
